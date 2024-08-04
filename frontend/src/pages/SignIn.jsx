@@ -1,11 +1,61 @@
 /* eslint-disable react/no-unescaped-entities */
-import React from "react";
-import { Input } from "antd";
+import React, { useState } from "react";
+import { Input, notification } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    signInStart,
+    signInSuccess,
+    signInFailure,
+} from "../redux/user/UserSlice";
+import * as AuthApi from "../api/AuthApi";
 
 export default function SignIn() {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [formData, setFormData] = useState({});
+    const { isLoading } = useSelector((state) => state.user);
+
     const handleOnChange = (e) => {
-        console.log(e.target.value);
-    }
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        dispatch(signInStart());
+        try {
+            const response = await AuthApi.signIn({
+                email: formData.email,
+                password: formData.password,
+            });
+            if (response.status === "success") {
+                dispatch(signInSuccess(response.data));
+                notification.success({
+                    placement: "top",
+                    message: "Success",
+                    description: "Login successful",
+                });
+                navigate("/");
+            } else {
+                dispatch(signInFailure(response.message));
+                notification.error({
+                    placement: "top",
+                    message: "Error",
+                    description: response.message,
+                });
+            }
+        } catch (error) {
+            dispatch(signInFailure(error.message));
+            notification.error({
+                placement: "top",
+                message: "Error",
+                description: error.message,
+            });
+        }
+    };
+
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -20,7 +70,10 @@ export default function SignIn() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                <form id="sign-in" action="#" method="POST" className="space-y-6">
+                <form
+                    id="sign-in"
+                    onSubmit={handleSubmit}
+                    className="space-y-6">
                     <div>
                         <label
                             htmlFor="email"
@@ -28,7 +81,7 @@ export default function SignIn() {
                             Email address
                         </label>
                         <div className="mt-2">
-                            <Input onChange={handleOnChange}/>
+                            <Input onChange={handleOnChange} name="email" />
                         </div>
                     </div>
 
@@ -48,15 +101,19 @@ export default function SignIn() {
                             </div>
                         </div>
                         <div className="mt-2">
-                            <Input.Password onChange={handleOnChange}/>
+                            <Input.Password
+                                onChange={handleOnChange}
+                                name="password"
+                            />
                         </div>
                     </div>
 
                     <div>
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                            Sign in
+                            {isLoading ? "Loading..." : "Sign in"}
                         </button>
                     </div>
                 </form>

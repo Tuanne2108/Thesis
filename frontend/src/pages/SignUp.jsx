@@ -16,33 +16,25 @@ export default function SignUp() {
             [e.target.name]: e.target.value,
         });
     };
-    const validateEmail = (email) => {
-        const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        return emailRegEx.test(email);
-    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await AuthApi.signUp({
+            await AuthApi.signUp({
                 email: formData.email,
                 password: formData.password,
                 confirmedPassword: formData.confirmedPassword,
             });
-            if (response.status === "error") {
-                notification.error({
-                    message: "Error",
-                    description: response.message,
-                });
-            } else {
-                notification.success({
-                    message: "Success",
-                    description: "Registration successful",
-                });
-                navigate("/sign-in");
-            }
+            notification.success({
+                placement: "top",
+                message: "Success",
+                description: "Registration successful",
+            });
+            navigate("/sign-in");
         } catch (error) {
             notification.error({
+                placement: "top",
                 message: "Error",
                 description: error.message,
             });

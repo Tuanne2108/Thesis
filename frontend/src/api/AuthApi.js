@@ -1,8 +1,8 @@
 import { authApi } from ".";
 export const signIn = async (user) => {
     try {
-        const res = await authApi.post("/sign-in", user);
-        return res.data;
+        const response = await authApi.post("/sign-in", user);
+        return response.data;
     } catch (error) {
         if (error.response) {
             throw new Error(error.response.data.message);

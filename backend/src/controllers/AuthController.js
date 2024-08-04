@@ -63,7 +63,7 @@ const signIn = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(401)
-                .json({ message: "Invalid email or password" });
+                .json({ message:"Password is not correct!" });
         }
 
         // Generate JWT token
