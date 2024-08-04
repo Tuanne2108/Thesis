@@ -3,6 +3,9 @@ import React from "react";
 import { Input } from "antd";
 
 export default function SignIn() {
+    const handleOnChange = (e) => {
+        console.log(e.target.value);
+    }
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -17,7 +20,7 @@ export default function SignIn() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                <form action="#" method="POST" className="space-y-6">
+                <form id="sign-in" action="#" method="POST" className="space-y-6">
                     <div>
                         <label
                             htmlFor="email"
@@ -25,7 +28,7 @@ export default function SignIn() {
                             Email address
                         </label>
                         <div className="mt-2">
-                            <Input />
+                            <Input onChange={handleOnChange}/>
                         </div>
                     </div>
 
@@ -45,7 +48,7 @@ export default function SignIn() {
                             </div>
                         </div>
                         <div className="mt-2">
-                            <Input.Password />
+                            <Input.Password onChange={handleOnChange}/>
                         </div>
                     </div>
 

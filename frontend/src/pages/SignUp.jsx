@@ -1,8 +1,56 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable react/no-unescaped-entities */
-import React from "react";
-import { Input } from "antd";
+import React, { useState } from "react";
+import { Input, notification } from "antd";
+import { useNavigate } from "react-router-dom";
+import * as AuthApi from "../api/AuthApi";
 
 export default function SignUp() {
+    const [formData, setFormData] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleOnChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+    const validateEmail = (email) => {
+        const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        return emailRegEx.test(email);
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const response = await AuthApi.signUp({
+                email: formData.email,
+                password: formData.password,
+                confirmedPassword: formData.confirmedPassword,
+            });
+            if (response.status === "error") {
+                notification.error({
+                    message: "Error",
+                    description: response.message,
+                });
+            } else {
+                notification.success({
+                    message: "Success",
+                    description: "Registration successful",
+                });
+                navigate("/sign-in");
+            }
+        } catch (error) {
+            notification.error({
+                message: "Error",
+                description: error.message,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -17,7 +65,10 @@ export default function SignUp() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                <form action="#" method="POST" className="space-y-6">
+                <form
+                    id="sign-up"
+                    className="space-y-6"
+                    onSubmit={handleSubmit}>
                     <div>
                         <label
                             htmlFor="email"
@@ -25,7 +76,11 @@ export default function SignUp() {
                             Email address
                         </label>
                         <div className="mt-2">
-                            <Input />
+                            <Input
+                                name="email"
+                                onChange={handleOnChange}
+                                required
+                            />
                         </div>
                     </div>
 
@@ -38,7 +93,11 @@ export default function SignUp() {
                             </label>
                         </div>
                         <div className="mt-2">
-                            <Input.Password />
+                            <Input.Password
+                                name="password"
+                                onChange={handleOnChange}
+                                required
+                            />
                         </div>
                     </div>
 
@@ -51,15 +110,20 @@ export default function SignUp() {
                             </label>
                         </div>
                         <div className="mt-2">
-                            <Input.Password />
+                            <Input.Password
+                                name="confirmedPassword"
+                                onChange={handleOnChange}
+                                required
+                            />
                         </div>
                     </div>
 
                     <div>
                         <button
+                            disabled={isLoading}
                             type="submit"
-                            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                            Sign up
+                            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 ">
+                            {isLoading ? "Loading..." : "Sign up"}
                         </button>
                     </div>
                 </form>

@@ -5,18 +5,25 @@ const jwt = require("jsonwebtoken");
 const signUp = async (req, res) => {
     try {
         const { email, password, confirmedPassword } = req.body;
+
         const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         if (!emailRegEx.test(email)) {
-            return res.status(400).json({ message: "Invalid email format" });
+            return res
+                .status(400)
+                .json({ status: "error", message: "Invalid email format" });
         }
         if (password !== confirmedPassword) {
-            return res.status(400).json({ message: "Passwords do not match" });
+            return res
+                .status(400)
+                .json({ status: "error", message: "Passwords do not match" });
         }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "Email already exists" });
+            return res
+                .status(400)
+                .json({ status: "error", message: "Email already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,13 +31,13 @@ const signUp = async (req, res) => {
             email,
             password: hashedPassword,
         });
+
         return res.status(201).json({
             status: "success",
             message: "User created successfully",
             data: createdUser,
         });
     } catch (err) {
-        console.error(err);
         return res.status(500).json({
             status: "error",
             message: "Error creating user",
@@ -42,6 +49,7 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -72,7 +80,6 @@ const signIn = async (req, res) => {
             data: rest,
         });
     } catch (err) {
-        console.error(err);
         return res.status(500).json({
             status: "error",
             message: "Error logging in user",
