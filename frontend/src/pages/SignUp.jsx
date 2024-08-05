@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Input, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import * as AuthApi from "../api/AuthApi";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
     const [formData, setFormData] = useState({});
@@ -44,33 +45,33 @@ export default function SignUp() {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img
-                    alt=""
-                    src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
-                    className="mx-auto h-20 w-auto"
-                />
-                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                    Register your account
-                </h2>
-            </div>
+        <div className="flex min-h-screen items-center justify-center bg-gray-100">
+            <div className="w-full max-w-md p-6 space-y-8 bg-white rounded-lg shadow-md">
+                <div className="text-center">
+                    <img
+                        alt=""
+                        src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
+                        className="mx-auto h-20 w-auto"
+                    />
+                    <h2 className="mt-6 text-2xl font-bold text-gray-900">
+                        Register your account
+                    </h2>
+                </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form
-                    id="sign-up"
-                    className="space-y-6"
-                    onSubmit={handleSubmit}>
+                    id="sign-in"
+                    onSubmit={handleSubmit}
+                    className="space-y-6">
                     <div>
                         <label
                             htmlFor="email"
-                            className="block text-sm font-medium leading-6 text-gray-900">
+                            className="block text-sm font-medium text-gray-700">
                             Email address
                         </label>
                         <div className="mt-2">
                             <Input
-                                name="email"
                                 onChange={handleOnChange}
+                                name="email"
                                 required
                             />
                         </div>
@@ -80,14 +81,14 @@ export default function SignUp() {
                         <div className="flex items-center justify-between">
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium leading-6 text-gray-900">
+                                className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
                         </div>
                         <div className="mt-2">
                             <Input.Password
-                                name="password"
                                 onChange={handleOnChange}
+                                name="password"
                                 required
                             />
                         </div>
@@ -97,14 +98,14 @@ export default function SignUp() {
                         <div className="flex items-center justify-between">
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium leading-6 text-gray-900">
-                                Confirmed Password
+                                className="block text-sm font-medium text-gray-700">
+                                Confirm Password
                             </label>
                         </div>
                         <div className="mt-2">
                             <Input.Password
-                                name="confirmedPassword"
                                 onChange={handleOnChange}
+                                name="confirmedPassword"
                                 required
                             />
                         </div>
@@ -112,22 +113,25 @@ export default function SignUp() {
 
                     <div>
                         <button
-                            disabled={isLoading}
                             type="submit"
-                            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 ">
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {isLoading ? "Loading..." : "Sign up"}
                         </button>
                     </div>
                 </form>
 
-                <p className="mt-10 text-center text-sm text-gray-500">
-                    Already have an account?{" "}
-                    <a
-                        href="/sign-in"
-                        className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                        Sign In
-                    </a>
-                </p>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                        Already have an account?{" "}
+                        <a
+                            href="/sign-in"
+                            className="font-semibold text-indigo-600 hover:text-indigo-500">
+                            Sign In
+                        </a>
+                    </p>
+                </div>
+                <OAuth />
             </div>
         </div>
     );

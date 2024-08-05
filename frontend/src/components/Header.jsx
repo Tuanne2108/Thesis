@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
     Dialog,
     DialogPanel,
@@ -24,6 +26,12 @@ import {
     PhoneIcon,
     PlayCircleIcon,
 } from "@heroicons/react/20/solid";
+import * as AuthApi from "../api/AuthApi";
+import {
+    signOutStart,
+    signOutSuccess,
+    signOutFailure,
+} from "../redux/user/UserSlice";
 
 const products = [
     {
@@ -62,8 +70,25 @@ const callsToAction = [
     { name: "Contact sales", href: "#", icon: PhoneIcon },
 ];
 
-export default function Example() {
+export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const currentUser = useSelector((state) => state.user.currentUser);
+
+    const handleSignOut = async () => {
+        try {
+            dispatch(signOutStart());
+            const res = await AuthApi.signOut();
+            if (res.status === "success") {
+                dispatch(signOutSuccess("Signed out successfully"));
+                navigate("/");
+            }
+        } catch (error) {
+            dispatch(signOutFailure(error.message));
+        }
+    };
+    console.log(currentUser);
 
     return (
         <header className="bg-slate-800">
@@ -74,8 +99,8 @@ export default function Example() {
                     <a href="/" className="-m-1.5 p-1.5">
                         <img
                             alt=""
-                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                            className="h-8 w-auto"
+                            src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
+                            className="h-10 w-auto"
                         />
                     </a>
                 </div>
@@ -159,11 +184,37 @@ export default function Example() {
                     </a>
                 </PopoverGroup>
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                    <a
-                        href="/sign-in"
-                        className="text-sm font-semibold leading-6 text-yellow-600">
-                        Log in <span aria-hidden="true">&rarr;</span>
-                    </a>
+                    {currentUser ? (
+                        <Popover>
+                            <Popover.Button className="flex items-center space-x-2">
+                                <img
+                                    className="rounded-full h-10 w-10 object-cover"
+                                    src={currentUser.avatar}
+                                    alt="profile"
+                                />
+                            </Popover.Button>
+                            <Popover.Panel className="absolute right-20 z-10 mt-2 w-48 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                                <div className="py-1">
+                                    <a
+                                        href="/profile"
+                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Profile
+                                    </a>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Log out
+                                    </button>
+                                </div>
+                            </Popover.Panel>
+                        </Popover>
+                    ) : (
+                        <a
+                            href="/sign-in"
+                            className="text-sm font-semibold leading-6 text-yellow-600">
+                            Log in <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    )}
                 </div>
             </nav>
             <Dialog

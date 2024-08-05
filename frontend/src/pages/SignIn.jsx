@@ -9,6 +9,7 @@ import {
     signInFailure,
 } from "../redux/user/UserSlice";
 import * as AuthApi from "../api/AuthApi";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -57,19 +58,19 @@ export default function SignIn() {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img
-                    alt=""
-                    src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
-                    className="mx-auto h-20 w-auto"
-                />
-                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                    Sign in to your account
-                </h2>
-            </div>
+        <div className="flex min-h-screen items-center justify-center bg-gray-100">
+            <div className="w-full max-w-md p-6 space-y-8 bg-white rounded-lg shadow-md">
+                <div className="text-center">
+                    <img
+                        alt=""
+                        src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
+                        className="mx-auto h-20 w-auto"
+                    />
+                    <h2 className="mt-6 text-2xl font-bold text-gray-900">
+                        Sign in to your account
+                    </h2>
+                </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form
                     id="sign-in"
                     onSubmit={handleSubmit}
@@ -77,11 +78,15 @@ export default function SignIn() {
                     <div>
                         <label
                             htmlFor="email"
-                            className="block text-sm font-medium leading-6 text-gray-900">
+                            className="block text-sm font-medium text-gray-700">
                             Email address
                         </label>
                         <div className="mt-2">
-                            <Input onChange={handleOnChange} name="email" />
+                            <Input
+                                onChange={handleOnChange}
+                                name="email"
+                                required
+                            />
                         </div>
                     </div>
 
@@ -89,7 +94,7 @@ export default function SignIn() {
                         <div className="flex items-center justify-between">
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium leading-6 text-gray-900">
+                                className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
                             <div className="text-sm">
@@ -104,6 +109,7 @@ export default function SignIn() {
                             <Input.Password
                                 onChange={handleOnChange}
                                 name="password"
+                                required
                             />
                         </div>
                     </div>
@@ -112,20 +118,24 @@ export default function SignIn() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {isLoading ? "Loading..." : "Sign in"}
                         </button>
                     </div>
                 </form>
 
-                <p className="mt-10 text-center text-sm text-gray-500">
-                    Don't have an account?{" "}
-                    <a
-                        href="/sign-up"
-                        className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                        Sign Up
-                    </a>
-                </p>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                        Don't have an account?{" "}
+                        <a
+                            href="/sign-up"
+                            className="font-semibold text-indigo-600 hover:text-indigo-500">
+                            Sign Up
+                        </a>
+                    </p>
+                </div>
+
+                <OAuth />
             </div>
         </div>
     );
