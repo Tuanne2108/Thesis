@@ -90,7 +90,7 @@ const signIn = async (req, res) => {
 
 const googleSignIn = async (req, res) => {
     try {
-        const { name, email, photo } = req.body;
+        const { username, email, photo } = req.body;
         let user = await User.findOne({ email });
 
         if (user) {
@@ -115,8 +115,8 @@ const googleSignIn = async (req, res) => {
             const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
             const newUser = await User.create({
-                name:
-                    (name || "").split(" ").join("").toLowerCase() +
+                username:
+                    (username || "").split(" ").join("").toLowerCase() +
                     Math.random().toString(36).slice(-4),
                 email,
                 password: hashedPassword,

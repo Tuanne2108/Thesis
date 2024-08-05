@@ -88,7 +88,6 @@ export default function Header() {
             dispatch(signOutFailure(error.message));
         }
     };
-    console.log(currentUser);
 
     return (
         <header className="bg-slate-800">
@@ -188,7 +187,7 @@ export default function Header() {
                         <Popover>
                             <Popover.Button className="flex items-center space-x-2">
                                 <img
-                                    className="rounded-full h-10 w-10 object-cover"
+                                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
                                     src={currentUser.avatar}
                                     alt="profile"
                                 />

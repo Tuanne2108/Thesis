@@ -31,7 +31,7 @@ export default function OAuth() {
             const user = result.user;
 
             const userData = {
-                name: user.displayName,
+                username: user.displayName,
                 email: user.email,
                 photo: user.photoURL,
             };
