@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const dotenv = require("dotenv");
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const corsOptions = {
 //Configuration
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ limit: "200mb", extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     getDownloadURL,
     getStorage,
@@ -8,20 +9,27 @@ import {
     uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
-import { Flex, Progress } from "antd";
+import {
+    updateUserStart,
+    updateUserSuccess,
+    updateUserFailure,
+} from "../redux/user/UserSlice";
+import { Flex, Progress, notification, Spin } from "antd";
+import * as UserApi from "../api/UserApi";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function Profile() {
     const currentUser = useSelector((state) => state.user.currentUser);
     const fileRef = useRef(null);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [file, setFile] = useState(undefined);
     const [filePercent, setFilePercent] = useState(0);
     const [formData, setFormData] = useState({});
     const [uploading, setUploading] = useState(false);
     const [uploadComplete, setUploadComplete] = useState(false);
     const [uploadError, setUploadError] = useState(false);
-    console.log(file);
-    console.log(filePercent);
+    const [isLoading, setIsLoading] = useState(false);
 
     /* firebase storage rules:
      allow read;
@@ -67,6 +75,41 @@ export default function Profile() {
         );
     };
 
+    const handleOnChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            dispatch(updateUserStart());
+            const res = await UserApi.updateUser(currentUser._id, formData);
+            if (res.status === "success") {
+                dispatch(updateUserSuccess(res.data));
+                notification.success({
+                    placement: "top",
+                    message: "Success",
+                    description: "Profile updated successfully",
+                });
+                navigate("/profile");
+            } else {
+                dispatch(updateUserFailure(res.message));
+                notification.error({
+                    placement: "top",
+                    message: "Error",
+                    description: res.message,
+                });
+            }
+        } catch (error) {
+            notification.error({
+                placement: "top",
+                message: "Error",
+                description: error.message,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <div className="flex justify-center py-12 bg-gray-50 min-h-screen">
             <form className="space-y-12 w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
@@ -76,7 +119,7 @@ export default function Profile() {
                         {currentUser ? (
                             <img
                                 className="inline-block h-40 w-40 rounded-full"
-                                src={currentUser.avatar}
+                                src={formData.avatar || currentUser.avatar}
                                 alt="user avatar"
                             />
                         ) : (
@@ -143,8 +186,9 @@ export default function Profile() {
                                 id="username"
                                 name="username"
                                 type="text"
-                                placeholder="user123..."
+                                defaultValue={currentUser.username}
                                 autoComplete="username"
+                                onChange={handleOnChange}
                                 className="mt-1 block w-full border rounded-md py-2 px-3 text-gray-900 placeholder-gray-400 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
@@ -220,7 +264,9 @@ export default function Profile() {
                                 id="email"
                                 name="email"
                                 type="email"
+                                defaultValue={currentUser.email}
                                 autoComplete="email"
+                                onChange={handleOnChange}
                                 className="mt-1 block w-full border rounded-md py-2 px-3 text-gray-900 placeholder-gray-400 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
@@ -313,13 +359,15 @@ export default function Profile() {
                 <div className="flex items-center justify-end gap-x-4 mt-8">
                     <button
                         type="button"
+                        onClick={() => navigate("/")}
                         className="text-sm font-semibold text-gray-900">
                         Cancel
                     </button>
                     <button
                         type="submit"
+                        onClick={handleSubmit}
                         className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600">
-                        Save
+                        {isLoading ? <Spin /> : "Save"}
                     </button>
                 </div>
             </form>

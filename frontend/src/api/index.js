@@ -8,4 +8,11 @@ export const authApi = axios.create({
     withCredentials: true,
 });
 
+export const userApi = axios.create({
+    baseURL: "http://localhost:3000/api/user",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    withCredentials: true,
+});
 

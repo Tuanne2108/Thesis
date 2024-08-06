@@ -1,9 +1,9 @@
-// const express = require("express");
-// const router = express.Router();
-// const userController = require("../controllers/UserController");
+const express = require("express");
+const router = express.Router();
+const verifyToken = require("../middleware/verifyUser");
+const userController = require("../controllers/UserController");
 
-// //Request
-// router.put("/update-user/:id", userController.updateUser);
-// router.post("/logout", userController.logOutUser);
+//Request
+router.put("/update-user/:id", verifyToken, userController.updateUser);
 
-// module.exports = router;
+module.exports = router;
