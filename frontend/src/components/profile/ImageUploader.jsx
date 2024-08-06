@@ -71,7 +71,7 @@ export const ImageUploader = ({
         <div className="flex flex-col items-center">
             {currentUser ? (
                 <img
-                    className="inline-block h-40 w-40 rounded-full"
+                    className="object-cover h-40 w-40 ring-2 ring-black rounded-full"
                     src={formData.avatar || currentUser.avatar}
                     alt="user avatar"
                 />

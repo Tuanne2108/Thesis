@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Input, notification, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import * as AuthApi from "../api/AuthApi";
-import OAuth from "../components/OAuth";
 
 export default function SignUp() {
     const [formData, setFormData] = useState({});
@@ -131,7 +130,6 @@ export default function SignUp() {
                         </a>
                     </p>
                 </div>
-                <OAuth />
             </div>
         </div>
     );

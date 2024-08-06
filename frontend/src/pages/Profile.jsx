@@ -10,8 +10,8 @@ import {
     deleteUserFailure,
 } from "../redux/user/UserSlice";
 import { notification, Spin, Button } from "antd";
-import { ImageUploader } from "../components/ImageUploader";
-import { CountrySelector } from "../components/CountrySelector";
+import { ImageUploader } from "../components/profile/ImageUploader";
+import { CountrySelector } from "../components/profile/CountrySelector";
 import { ModalComponent } from "../components/ModalComponent";
 import * as UserApi from "../api/UserApi";
 export default function Profile() {
@@ -107,9 +107,9 @@ export default function Profile() {
 
     return (
         <div className="flex justify-center py-12 bg-gradient-to-b from-gray-100 to-gray-300 min-h-screen">
-            <form className="space-y-12 w-full max-w-4xl bg-white p-10 rounded-3xl shadow-2xl transform transition duration-500 hover:scale-105 hover:shadow-xl">
+            <form className="space-y-8 w-full max-w-4xl bg-white p-8 rounded-xl shadow-md">
                 {/* Photo Section */}
-                <div className="flex justify-center mb-12">
+                <div className="flex justify-center mb-8">
                     <ImageUploader
                         currentUser={currentUser}
                         setFormData={setFormData}
@@ -119,16 +119,16 @@ export default function Profile() {
                 </div>
 
                 {/* Profile Section */}
-                <section className="border-b border-gray-300 pb-12">
-                    <h2 className="text-3xl font-extrabold text-gray-800 mb-4">
+                <section className="border-b border-gray-300 pb-8">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         Profile
                     </h2>
-                    <p className="mt-1 text-lg text-gray-600">
+                    <p className="text-base text-gray-600">
                         This information will be displayed publicly, so be
                         careful what you share.
                     </p>
 
-                    <div className="mt-8 grid grid-cols-1 gap-y-8 md:grid-cols-2 md:gap-x-12">
+                    <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Username */}
                         <div className="md:col-span-1">
                             <label
@@ -143,7 +143,7 @@ export default function Profile() {
                                 defaultValue={currentUser.username}
                                 autoComplete="username"
                                 onChange={handleOnChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
 
@@ -158,7 +158,8 @@ export default function Profile() {
                                 id="about"
                                 name="about"
                                 rows={4}
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                onChange={handleOnChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                                 placeholder="Write a few sentences about yourself."
                             />
                         </div>
@@ -166,15 +167,15 @@ export default function Profile() {
                 </section>
 
                 {/* Personal Information Section */}
-                <section className="border-b border-gray-300 pb-12">
-                    <h2 className="text-3xl font-extrabold text-gray-800 mb-4">
+                <section className="border-b border-gray-300 pb-8">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         Personal Information
                     </h2>
-                    <p className="mt-1 text-lg text-gray-600">
+                    <p className="text-base text-gray-600">
                         Use a permanent address where you can receive mail.
                     </p>
 
-                    <div className="mt-8 grid grid-cols-1 gap-y-8 md:grid-cols-2 md:gap-x-12">
+                    <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Email Address */}
                         <div className="md:col-span-2">
                             <label
@@ -189,7 +190,7 @@ export default function Profile() {
                                 defaultValue={currentUser.email}
                                 autoComplete="email"
                                 onChange={handleOnChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
 
@@ -218,7 +219,9 @@ export default function Profile() {
                                 name="city"
                                 type="text"
                                 autoComplete="address-level2"
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                onChange={handleOnChange}
+                                defaultValue={formData.city} // assuming formData.city exists
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
 
@@ -234,7 +237,9 @@ export default function Profile() {
                                 name="region"
                                 type="text"
                                 autoComplete="address-level1"
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                onChange={handleOnChange}
+                                defaultValue={formData.region} // assuming formData.region exists
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
 
@@ -250,33 +255,34 @@ export default function Profile() {
                                 name="street-address"
                                 type="text"
                                 autoComplete="street-address"
-                                className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-4 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 transition"
+                                onChange={handleOnChange}
+                                defaultValue={formData.streetAddress} // assuming formData.streetAddress exists
+                                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
                     </div>
                 </section>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between gap-x-4 mt-12">
+                <div className="flex items-center justify-between gap-x-4 mt-8">
                     {/* Delete Account Button */}
                     <button
                         type="button"
                         onClick={handleDeleteAccount}
-                        className="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-600 transition">
+                        className="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-600">
                         Delete Account
                     </button>
-
                     <div className="flex items-center gap-x-4">
                         <button
                             type="button"
                             onClick={() => navigate("/")}
-                            className="text-sm font-semibold text-gray-900 hover:text-gray-700 transition">
+                            className="text-sm font-semibold text-gray-900 hover:text-gray-700">
                             Cancel
                         </button>
                         <button
                             type="submit"
                             onClick={handleSubmit}
-                            className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition">
+                            className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600">
                             {isLoading ? <Spin /> : "Save"}
                         </button>
                     </div>
@@ -284,20 +290,15 @@ export default function Profile() {
             </form>
             {/* Confirmation Modal */}
             <ModalComponent
-                title="Delete Account"
                 visible={isModalVisible}
                 footer={[
-                    <Button
-                        key="delete"
-                        onClick={handleModalOk}
-                        type="primary"
-                        danger>
-                        Delete
+                    <Button key="delete" onClick={handleModalOk} type="primary" danger>
+                      Delete
                     </Button>,
                     <Button key="cancel" onClick={handleModalCancel}>
-                        Cancel
+                      Cancel
                     </Button>,
-                ]}
+                  ]}
                 modalText="Are you sure you want to delete your account? This action cannot be undone."
             />
         </div>

@@ -4,7 +4,7 @@ import { notification } from "antd";
 import {
     faGoogle,
     faFacebook,
-    faXTwitter,
+    faApple,
 } from "@fortawesome/free-brands-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -13,7 +13,6 @@ import {
     signInWithPopup,
     GoogleAuthProvider,
     FacebookAuthProvider,
-    TwitterAuthProvider,
 } from "firebase/auth";
 import { app } from "../firebase";
 import * as AuthApi from "../api/AuthApi";
@@ -64,36 +63,45 @@ export default function OAuth() {
         }
     };
 
-    const handleXTwitterClick = async () => {
-        try {
-            const provider = new TwitterAuthProvider();
-            const result = await signInWithPopup(auth, provider);
-            const response = await AuthApi.xTwitterSignIn();
-            dispatch(signInSuccess(response.data));
-            navigate("/");
-        } catch (error) {
-            dispatch(signInFailure(error.message));
-        }
-    };
+    const handleAppleClick = async () => {};
 
     return (
-        <div className="flex flex-col items-center space-y-4">
-            <h2 className="text-center">Or continue with</h2>
-            <div className="flex space-x-4">
+        <div>
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">
+                        Or continue with
+                    </span>
+                </div>
+            </div>
+
+            <div className="flex justify-center space-x-4">
                 <button
                     onClick={handleGoogleClick}
-                    className="bg-red-500 text-white p-3 rounded-md">
-                    <FontAwesomeIcon icon={faGoogle} size="lg" />
+                    className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <FontAwesomeIcon
+                        icon={faGoogle}
+                        className="mr-2 text-red-500"
+                    />
+                    Google
                 </button>
                 <button
-                    onClick={handleFacebookClick}   
-                    className="bg-blue-600 text-white p-3 rounded-md">
-                    <FontAwesomeIcon icon={faFacebook} size="lg" />
+                    onClick={handleFacebookClick}
+                    className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <FontAwesomeIcon
+                        icon={faFacebook}
+                        className="mr-2 text-blue-500"
+                    />
+                    Facebook
                 </button>
                 <button
-                    onClick={handleXTwitterClick}
-                    className="bg-black text-white p-3 rounded-md">
-                    <FontAwesomeIcon icon={faXTwitter} size="lg" />
+                    onClick={handleAppleClick}
+                    className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <FontAwesomeIcon icon={faApple} className="mr-2" />
+                    Apple
                 </button>
             </div>
         </div>
