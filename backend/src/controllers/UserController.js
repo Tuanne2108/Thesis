@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
 
 const updateUser = async (req, res) => {
     if (req.user.id !== req.params.id) {
@@ -48,4 +47,26 @@ const updateUser = async (req, res) => {
     }
 };
 
-module.exports = { updateUser };
+const deleteUser = async (req, res) => {
+    if (req.user.id !== req.params.id) {
+        return res.status(403).json({
+            status: "error",
+            message: "Unauthorized",
+        });
+    }
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.clearCookie("access_token");
+        return res.status(200).json({
+            status: "success",
+            message: "User deleted successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            message: "Error deleting user",
+        });
+    }
+};
+
+module.exports = { updateUser, deleteUser };

@@ -12,3 +12,16 @@ export const updateUser = async (userId, userData) => {
         }
     }
 };
+
+export const deleteUser = async (userId) => {
+    try {
+        const response = await userApi.delete(`/delete-user/${userId}`);
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error("An unexpected error occurred");
+        }
+    }
+}

@@ -5,5 +5,5 @@ const userController = require("../controllers/UserController");
 
 //Request
 router.put("/update-user/:id", verifyToken, userController.updateUser);
-
+router.delete("/delete-user/:id", verifyToken, userController.deleteUser);
 module.exports = router;
