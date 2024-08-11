@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import * as AuthApi from "../api/AuthApi";
 
 export default function SignUp() {
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({role: "customer"});
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 

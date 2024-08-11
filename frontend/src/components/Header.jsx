@@ -119,6 +119,15 @@ export default function Header() {
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Profile
                                         </a>
+                                        {currentUser.role === "seller" ? (
+                                            <a
+                                                href="/seller-dashboard"
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                Dashboard
+                                            </a>
+                                        ) : (
+                                            ""
+                                        )}
                                         <button
                                             onClick={handleSignOut}
                                             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -130,9 +139,7 @@ export default function Header() {
                         ) : (
                             <a
                                 href="/sign-in"
-                                className={`text-sm font-semibold leading-6 ${
-                                    darkMode ? "text-yellow-600" : "text-black"
-                                }`}>
+                                className={`hover:text-yellow-600 text-sm font-semibold leading-6 `}>
                                 Log in <span aria-hidden="true">&rarr;</span>
                             </a>
                         )}

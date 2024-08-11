@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 const signUp = async (req, res) => {
     try {
         const { email, password, confirmedPassword } = req.body;
@@ -61,17 +62,26 @@ const signIn = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res
-                .status(401)
-                .json({ message: "Password is not correct!" });
+            return res.status(401).json({ message: "Password is incorrect!" });
         }
 
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-        res.cookie("access_token", token, {
+        const accessToken = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRATION }
+        );
+        const refreshToken = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
+        );
+        res.cookie("access_token", accessToken, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+        });
+        res.cookie("refresh_token", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
         });
         const { password: pass, ...rest } = user._doc;
         return res.status(200).json({
@@ -152,6 +162,7 @@ const googleSignIn = async (req, res) => {
 const signOut = async (req, res) => {
     try {
         res.clearCookie("access_token");
+        res.clearCookie("refresh_token");
         return res.status(200).json({
             status: "success",
             message: "User logged out successfully",
@@ -164,4 +175,45 @@ const signOut = async (req, res) => {
     }
 };
 
-module.exports = { signUp, signIn, googleSignIn, signOut };
+const refreshToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_token;
+
+        if (!refreshToken) {
+            return res
+                .status(401)
+                .json({ message: "Refresh token not provided" });
+        }
+
+        jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN_SECRET,
+            (err, user) => {
+                if (err) {
+                    return res
+                        .status(403)
+                        .json({ message: "Invalid refresh token" });
+                }
+
+                const accessToken = jwt.sign(
+                    { id: user.id, role: user.role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: process.env.JWT_EXPIRATION }
+                );
+
+                res.cookie("access_token", accessToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                });
+
+                return res.status(200).json({ message: "Token refreshed" });
+            }
+        );
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "An unexpected error occurred",
+        });
+    }
+};
+module.exports = { signUp, signIn, googleSignIn, signOut, refreshToken };

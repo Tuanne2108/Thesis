@@ -72,7 +72,7 @@ export const ImageUploader = ({
             {currentUser ? (
                 <img
                     className="object-cover h-40 w-40 ring-2 ring-black rounded-full"
-                    src={formData.avatar || currentUser.avatar}
+                    src={currentUser.avatar}
                     alt="user avatar"
                 />
             ) : (
@@ -85,11 +85,11 @@ export const ImageUploader = ({
                 <button
                     type="button"
                     onClick={() => fileRef.current.click()}
-                    className="mt-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+                    className="mt-3 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
                     Change Photo
                 </button>
             ) : (
-                <Flex wrap="true" gap="small">
+                <Flex className="mt-3" wrap="true" gap="small">
                     <Progress type="circle" percent={filePercent} size={50} />
                 </Flex>
             )}

@@ -38,7 +38,6 @@ export default function SignIn() {
                     message: "Success",
                     description: "Login successful",
                 });
-                navigate("/");
             } else {
                 dispatch(signInFailure(response.message));
                 notification.error({

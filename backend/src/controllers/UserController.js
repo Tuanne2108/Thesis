@@ -1,5 +1,5 @@
 const User = require("../models/User");
-
+const Seller = require("../models/Seller");
 const updateUser = async (req, res) => {
     if (req.user.id !== req.params.id) {
         return res.status(403).json({
@@ -69,4 +69,40 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { updateUser, deleteUser };
+const becomeSeller = async (req, res) => {
+    try {
+        const { userId, shopName, shopAddress, contactNumber, description } =
+            req.body;
+
+        const existingSeller = await Seller.findOne({ userId });
+        if (existingSeller) {
+            return res.status(400).json({
+                status: "error",
+                message: "User is already registered as a seller",
+            });
+        }
+
+        const newSeller = await Seller.create({
+            userId,
+            shopName,
+            shopAddress,
+            contactNumber,
+            description,
+        });
+
+        await User.findByIdAndUpdate(userId, { role: "seller" });
+
+        res.status(201).json({
+            status: "success",
+            message: "Seller account created successfully",
+            data: newSeller,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "An error occurred while creating the seller account",
+        });
+    }
+};
+
+module.exports = { updateUser, deleteUser, becomeSeller };

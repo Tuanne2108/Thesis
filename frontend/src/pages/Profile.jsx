@@ -104,10 +104,29 @@ export default function Profile() {
     const handleModalCancel = () => {
         setModalVisible(false);
     };
-
+    const handleBecomeSeller = async () => {
+        if (currentUser.role === "seller") {
+            notification.warning({
+                placement: "top",
+                message: "Already a Seller",
+                description: "You are already registered as a seller.",
+            });
+            return;
+        }
+        navigate("/seller-sign-up");
+    };
     return (
         <div className="flex justify-center py-12 bg-gradient-to-b from-gray-100 to-gray-300 min-h-screen">
-            <form className="space-y-8 w-full max-w-4xl bg-white p-8 rounded-xl shadow-md">
+            <form className="relative space-y-8 w-full max-w-4xl bg-white p-8 rounded-xl shadow-md">
+                {currentUser.role !== "seller" && (
+                    <button
+                        type="button"
+                        onClick={handleBecomeSeller}
+                        className="absolute top-4 right-4 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                        Become a Seller
+                    </button>
+                )}
+
                 {/* Photo Section */}
                 <div className="flex justify-center mb-8">
                     <ImageUploader
@@ -290,15 +309,19 @@ export default function Profile() {
             </form>
             {/* Confirmation Modal */}
             <ModalComponent
-                visible={isModalVisible}
+                open={isModalVisible}
                 footer={[
-                    <Button key="delete" onClick={handleModalOk} type="primary" danger>
-                      Delete
+                    <Button
+                        key="delete"
+                        onClick={handleModalOk}
+                        type="primary"
+                        danger>
+                        Delete
                     </Button>,
                     <Button key="cancel" onClick={handleModalCancel}>
-                      Cancel
+                        Cancel
                     </Button>,
-                  ]}
+                ]}
                 modalText="Are you sure you want to delete your account? This action cannot be undone."
             />
         </div>

@@ -8,6 +8,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Contact from "./pages/Contact";
+import SellerSignUp from "./pages/SellerSignUp";
 import Header from "./components/Header";
 
 function AppRoutes() {
@@ -37,6 +38,7 @@ function AppRoutes() {
                 <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path='/seller-sign-up' element={<SellerSignUp />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

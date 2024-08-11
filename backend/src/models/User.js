@@ -1,22 +1,36 @@
 const mongoose = require("mongoose");
 
+const addressSchema = new mongoose.Schema({
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    country: { type: String, required: true },
+});
+
 const userSchema = new mongoose.Schema(
     {
-        username: { type: String },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
-        phone: { type: String },
-        avatar: {
-            type: String,
-            default: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
-        },
+        avatar: { type: String },
         role: {
             type: String,
-            enum: ["buyer", "seller", "admin"],
-            default: "buyer",
+            enum: ["customer", "seller", "admin"],
+            default: "customer",
+            required: true,
         },
+        profile: {
+            firstName: { type: String },
+            lastName: { type: String },
+            address: addressSchema,
+            phone: { type: String },
+        },
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+    }
 );
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

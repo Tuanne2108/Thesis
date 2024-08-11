@@ -2,10 +2,10 @@
 import React from 'react';
 import { Modal } from 'antd';
 
-export const ModalComponent = ({ title ,visible, footer, modalText }) => (
+export const ModalComponent = ({ title ,open, footer, modalText }) => (
   <Modal
     title={title}
-    visible={visible}
+    open={open}
     footer={footer}
   >
     <p>{modalText}</p>
