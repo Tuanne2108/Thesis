@@ -13,8 +13,6 @@ import {
     FaShoppingCart,
     FaHeart,
     FaGlobe,
-    FaSun,
-    FaMoon,
 } from "react-icons/fa";
 
 export default function Header() {
@@ -37,10 +35,6 @@ export default function Header() {
         }
     };
 
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
-        document.documentElement.classList.toggle("dark");
-    };
     return (
         <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
             <div className="container mx-auto flex justify-between items-center p-4">
@@ -72,7 +66,7 @@ export default function Header() {
                 </nav>
 
                 {/* Search and Icons */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-10">
                     {/* Search */}
                     <div className="relative hidden md:block">
                         <input
@@ -161,17 +155,6 @@ export default function Header() {
                             </div>
                         </Popover.Panel>
                     </Popover>
-
-                    {/* Dark Mode Toggle */}
-                    <button
-                        onClick={toggleDarkMode}
-                        className="focus:outline-none">
-                        {darkMode ? (
-                            <FaSun className="text-yellow-400 text-xl" />
-                        ) : (
-                            <FaMoon className="text-gray-500 text-xl" />
-                        )}
-                    </button>
                 </div>
 
                 {/* Mobile Menu Button */}

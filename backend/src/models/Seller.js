@@ -8,6 +8,7 @@ const sellerSchema = new mongoose.Schema(
             required: true,
         },
         shopName: { type: String, required: true },
+        shopAvatar: { type: String },
         shopAddress: { type: String, required: true },
         contactNumber: { type: String, required: true },
         description: { type: String },

@@ -38,6 +38,11 @@ export default function SignIn() {
                     message: "Success",
                     description: "Login successful",
                 });
+                if (response.data.role === "admin") {
+                    navigate("/admin-dashboard");
+                } else {
+                    navigate("/");
+                }
             } else {
                 dispatch(signInFailure(response.message));
                 notification.error({

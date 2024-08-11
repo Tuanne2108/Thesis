@@ -9,13 +9,22 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Contact from "./pages/Contact";
 import SellerSignUp from "./pages/SellerSignUp";
+import SellerDashboard from "./pages/SellerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
 import Header from "./components/Header";
 
 function AppRoutes() {
     const location = useLocation();
     const [showHeader, setShowHeader] = useState(true);
 
-    const hideHeaderPaths = ["/sign-in", "/sign-up"];
+    const hideHeaderPaths = [
+        "/sign-in",
+        "/sign-up",
+        "/seller-sign-up",
+        "/seller-dashboard",
+        "/admin-dashboard",
+    ];
     const validPaths = ["/", "/about", "/cart", "/profile", "/contact"];
     const isValidPath = validPaths.includes(location.pathname);
 
@@ -38,7 +47,9 @@ function AppRoutes() {
                 <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path='/seller-sign-up' element={<SellerSignUp />} />
+                <Route path="/seller-sign-up" element={<SellerSignUp />} />
+                <Route path="/seller-dashboard" element={<SellerDashboard />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>
