@@ -31,11 +31,15 @@ const Main = () => {
                 <Box>
                     <Button
                         sx={{
-                            backgroundColor: colors.blueAccent[700],
-                            color: colors.grey[100],
+                            backgroundColor: colors.accent.gold,
+                            color: colors.grey[500],
                             fontSize: "14px",
                             fontWeight: "bold",
                             padding: "10px 20px",
+                            "&:hover": {
+                                backgroundColor: colors.accent.tan,
+                                color: colors.grey[200],
+                            },
                         }}>
                         <DownloadOutlinedIcon sx={{ mr: "10px" }} />
                         Download Reports
@@ -52,7 +56,7 @@ const Main = () => {
                 {/* ROW 1 */}
                 <Box
                     gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     display="flex"
                     alignItems="center"
                     justifyContent="center">
@@ -64,7 +68,7 @@ const Main = () => {
                         icon={
                             <EmailIcon
                                 sx={{
-                                    color: colors.greenAccent[600],
+                                    color: colors.grey[200],
                                     fontSize: "26px",
                                 }}
                             />
@@ -73,7 +77,7 @@ const Main = () => {
                 </Box>
                 <Box
                     gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     display="flex"
                     alignItems="center"
                     justifyContent="center">
@@ -85,7 +89,7 @@ const Main = () => {
                         icon={
                             <PointOfSaleIcon
                                 sx={{
-                                    color: colors.greenAccent[600],
+                                    color: colors.grey[200],
                                     fontSize: "26px",
                                 }}
                             />
@@ -94,7 +98,7 @@ const Main = () => {
                 </Box>
                 <Box
                     gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     display="flex"
                     alignItems="center"
                     justifyContent="center">
@@ -106,7 +110,7 @@ const Main = () => {
                         icon={
                             <PersonAddIcon
                                 sx={{
-                                    color: colors.greenAccent[600],
+                                    color: colors.grey[200],
                                     fontSize: "26px",
                                 }}
                             />
@@ -115,7 +119,7 @@ const Main = () => {
                 </Box>
                 <Box
                     gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     display="flex"
                     alignItems="center"
                     justifyContent="center">
@@ -127,7 +131,7 @@ const Main = () => {
                         icon={
                             <TrafficIcon
                                 sx={{
-                                    color: colors.greenAccent[600],
+                                    color: colors.grey[200],
                                     fontSize: "26px",
                                 }}
                             />
@@ -139,7 +143,7 @@ const Main = () => {
                 <Box
                     gridColumn="span 8"
                     gridRow="span 2"
-                    backgroundColor={colors.primary[400]}>
+                    backgroundColor={colors.primary[700]}>
                     <Box
                         mt="25px"
                         p="0 30px"
@@ -150,13 +154,13 @@ const Main = () => {
                             <Typography
                                 variant="h5"
                                 fontWeight="600"
-                                color={colors.grey[100]}>
+                                color={colors.grey[200]}>
                                 Revenue Generated
                             </Typography>
                             <Typography
                                 variant="h3"
                                 fontWeight="bold"
-                                color={colors.greenAccent[500]}>
+                                color={colors.accent.gold}>
                                 $59,342.32
                             </Typography>
                         </Box>
@@ -165,7 +169,7 @@ const Main = () => {
                                 <DownloadOutlinedIcon
                                     sx={{
                                         fontSize: "26px",
-                                        color: colors.greenAccent[500],
+                                        color: colors.accent.gold,
                                     }}
                                 />
                             </IconButton>
@@ -178,17 +182,16 @@ const Main = () => {
                 <Box
                     gridColumn="span 4"
                     gridRow="span 2"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     overflow="auto">
                     <Box
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center"
-                        borderBottom={`4px solid ${colors.primary[500]}`}
-                        colors={colors.grey[100]}
+                        borderBottom={`4px solid ${colors.primary[300]}`}
                         p="15px">
                         <Typography
-                            color={colors.grey[100]}
+                            color={colors.grey[200]}
                             variant="h5"
                             fontWeight="600">
                             Recent Transactions
@@ -200,24 +203,24 @@ const Main = () => {
                             display="flex"
                             justifyContent="space-between"
                             alignItems="center"
-                            borderBottom={`4px solid ${colors.primary[500]}`}
+                            borderBottom={`2px solid ${colors.primary[300]}`}
                             p="15px">
                             <Box>
                                 <Typography
-                                    color={colors.greenAccent[500]}
+                                    color={colors.accent.tan}
                                     variant="h5"
                                     fontWeight="600">
                                     {transaction.txId}
                                 </Typography>
-                                <Typography color={colors.grey[100]}>
+                                <Typography color={colors.grey[200]}>
                                     {transaction.user}
                                 </Typography>
                             </Box>
-                            <Box color={colors.grey[100]}>
+                            <Box color={colors.grey[200]}>
                                 {transaction.date}
                             </Box>
                             <Box
-                                backgroundColor={colors.greenAccent[500]}
+                                backgroundColor={colors.accent.tan}
                                 p="5px 10px"
                                 borderRadius="4px">
                                 ${transaction.cost}
@@ -230,7 +233,7 @@ const Main = () => {
                 <Box
                     gridColumn="span 4"
                     gridRow="span 2"
-                    backgroundColor={colors.primary[400]}
+                    backgroundColor={colors.primary[700]}
                     p="30px">
                     <Typography variant="h5" fontWeight="600">
                         Campaign
@@ -243,7 +246,7 @@ const Main = () => {
                         <ProgressCircle size="125" />
                         <Typography
                             variant="h5"
-                            color={colors.greenAccent[500]}
+                            color={colors.accent.gold}
                             sx={{ mt: "15px" }}>
                             $48,352 revenue generated
                         </Typography>
@@ -253,9 +256,9 @@ const Main = () => {
                     </Box>
                 </Box>
                 <Box
-                    gridColumn="span 4"
+                    gridColumn="span 8"
                     gridRow="span 2"
-                    backgroundColor={colors.primary[400]}>
+                    backgroundColor={colors.primary[700]}>
                     <Typography
                         variant="h5"
                         fontWeight="600"

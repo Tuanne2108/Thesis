@@ -10,10 +10,11 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -43,6 +44,7 @@ export default function SidebarComponent() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [selected, setSelected] = useState("Dashboard");
     const [sellerInfo, setSellerInfo] = useState(null);
+
     useEffect(() => {
         const fetchSellerData = async () => {
             try {
@@ -57,11 +59,13 @@ export default function SidebarComponent() {
             fetchSellerData();
         }
     }, [currentUser]);
+
     return (
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
                     background: `${colors.primary[400]} !important`,
+                    border: "none",
                 },
                 "& .pro-icon-wrapper": {
                     backgroundColor: "transparent !important",
@@ -76,7 +80,13 @@ export default function SidebarComponent() {
                     color: "#6870fa !important",
                 },
             }}>
-            <Sidebar collapsed={isCollapsed}>
+            <Sidebar
+                collapsed={isCollapsed}
+                backgroundColor={colors.primary[400]}
+                rootStyles={{
+                    border: "none",
+                    padding: "0",
+                }}>
                 <Menu iconShape="square">
                     {/* LOGO AND MENU ICON */}
                     <MenuItem
@@ -129,7 +139,7 @@ export default function SidebarComponent() {
                                 </Typography>
                                 <Typography
                                     variant="h5"
-                                    color={colors.greenAccent[500]}>
+                                    color={colors.accent.gold}>
                                     {currentUser.role}
                                 </Typography>
                             </Box>
@@ -147,7 +157,7 @@ export default function SidebarComponent() {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.accent.cream}
                             sx={{ m: "15px 0 5px 20px" }}>
                             Data
                         </Typography>
@@ -155,6 +165,13 @@ export default function SidebarComponent() {
                             title="Manage Customers"
                             to="/seller-dashboard/customers"
                             icon={<PeopleOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
+                            title="Manage Products"
+                            to="/seller-dashboard/products"
+                            icon={<AddShoppingCartOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
@@ -168,28 +185,21 @@ export default function SidebarComponent() {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.accent.cream}
                             sx={{ m: "15px 0 5px 20px" }}>
                             Pages
                         </Typography>
                         <Item
-                            title="Profile Form"
-                            to="/seller-dashboard/form"
-                            icon={<PersonOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-                        <Item
-                            title="Calendar"
-                            to="/seller-dashboard/calendar"
-                            icon={<CalendarTodayOutlinedIcon />}
+                            title="Product Form"
+                            to="/seller-dashboard/product-form"
+                            icon={<AllInboxOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.accent.cream}
                             sx={{ m: "15px 0 5px 20px" }}>
                             Charts
                         </Typography>

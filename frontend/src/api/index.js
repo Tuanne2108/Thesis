@@ -23,3 +23,11 @@ export const sellerApi = axios.create({
     },
     withCredentials: true,
 });
+
+export const productApi = axios.create({
+    baseURL: "http://localhost:3000/api/product",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    withCredentials: true,
+});

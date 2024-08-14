@@ -51,7 +51,6 @@ const createProduct = async (req, res) => {
         images,
         inventory: { quantity, reserved },
     } = req.body;
-
     try {
         if (!name || !price || !category || !quantity) {
             return res.status(400).json({
@@ -59,8 +58,19 @@ const createProduct = async (req, res) => {
                 message: "Missing required fields",
             });
         }
-
+        const existingProduct = await Product.findOne({
+            name,
+            sellerId: req.user._id,
+        });
+        
+        if (existingProduct) {
+            return res.status(409).json({
+                status: "error",
+                message: "A product with this name already exists.",
+            });
+        }
         const createdProduct = await Product.create({
+            sellerId: req.user._id,
             name,
             description,
             price,

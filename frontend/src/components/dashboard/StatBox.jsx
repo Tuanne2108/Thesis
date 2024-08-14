@@ -15,7 +15,7 @@ export default function StatBox({ title, subtitle, icon, progress, increase }) {
                     <Typography
                         variant="h4"
                         fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}>
+                        sx={{ color: colors.grey[200] }}>
                         {title}
                     </Typography>
                 </Box>
@@ -26,13 +26,13 @@ export default function StatBox({ title, subtitle, icon, progress, increase }) {
             <Box display="flex" justifyContent="space-between" mt="2px">
                 <Typography
                     variant="h5"
-                    sx={{ color: colors.greenAccent[500] }}>
+                    sx={{ color: colors.accent.gold }}>
                     {subtitle}
                 </Typography>
                 <Typography
                     variant="h5"
                     fontStyle="italic"
-                    sx={{ color: colors.greenAccent[600] }}>
+                    sx={{ color: colors.accent.gold }}>
                     {increase}
                 </Typography>
             </Box>

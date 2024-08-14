@@ -49,17 +49,17 @@ const Customers = () => {
             justifyContent="center"
             backgroundColor={
               access === "admin"
-                ? colors.greenAccent[600]
+                ? colors.accent.gold
                 : access === "manager"
-                ? colors.greenAccent[700]
-                : colors.greenAccent[700]
+                ? colors.accent.tan
+                : colors.primary[300]
             }
             borderRadius="4px"
           >
             {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
             {access === "manager" && <SecurityOutlinedIcon />}
             {access === "user" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
+            <Typography color={colors.grey[900]} sx={{ ml: "5px" }}>
               {access}
             </Typography>
           </Box>
@@ -70,7 +70,7 @@ const Customers = () => {
 
   return (
     <Box m="20px">
-      <Header title="TEAM" subtitle="Managing the Team Members" />
+      <Header title="CUSTOMERS" subtitle="Managing Customers" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -82,10 +82,10 @@ const Customers = () => {
             borderBottom: "none",
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: colors.accent.tan,
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.primary[600], 
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -93,10 +93,10 @@ const Customers = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.primary[600],
           },
           "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
+            color: `${colors.accent.gold} !important`,
           },
         }}
       >

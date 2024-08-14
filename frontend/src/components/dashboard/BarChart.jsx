@@ -15,43 +15,47 @@ export default function BarChart({ isDashboard = false }) {
                 axis: {
                     domain: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                         },
                     },
                     legend: {
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                     ticks: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                             strokeWidth: 1,
                         },
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                 },
                 legends: {
                     text: {
-                        fill: colors.grey[100],
+                        fill: colors.grey[200],
                     },
                 },
             }}
-            keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
+            keys={["hot dog", "burger", "kebab", "donut"]}
             indexBy="country"
             margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
             padding={0.3}
             valueScale={{ type: "linear" }}
             indexScale={{ type: "band", round: true }}
-            colors={{ scheme: "nivo" }}
+            colors={[
+                colors.accent.gold,
+                colors.primary[900],
+                colors.primary[300],
+            ]}
             defs={[
                 {
                     id: "dots",
                     type: "patternDots",
                     background: "inherit",
-                    color: "#38bcb2",
+                    color: colors.accent.tan,
                     size: 4,
                     padding: 1,
                     stagger: true,
@@ -60,7 +64,7 @@ export default function BarChart({ isDashboard = false }) {
                     id: "lines",
                     type: "patternLines",
                     background: "inherit",
-                    color: "#eed312",
+                    color: colors.accent.gold,
                     rotation: -45,
                     lineWidth: 6,
                     spacing: 10,
@@ -76,7 +80,7 @@ export default function BarChart({ isDashboard = false }) {
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: isDashboard ? undefined : "country", 
+                legend: isDashboard ? undefined : "country",
                 legendPosition: "middle",
                 legendOffset: 32,
             }}
@@ -84,7 +88,7 @@ export default function BarChart({ isDashboard = false }) {
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: isDashboard ? undefined : "food", 
+                legend: isDashboard ? undefined : "food",
                 legendPosition: "middle",
                 legendOffset: -40,
             }}

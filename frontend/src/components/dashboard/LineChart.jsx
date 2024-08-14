@@ -18,36 +18,36 @@ export default function LineChart({
                 axis: {
                     domain: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                         },
                     },
                     legend: {
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                     ticks: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                             strokeWidth: 1,
                         },
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                 },
                 legends: {
                     text: {
-                        fill: colors.grey[100],
+                        fill: colors.grey[200],
                     },
                 },
                 tooltip: {
                     container: {
-                        color: colors.primary[500],
+                        color: colors.primary[900],
                     },
                 },
             }}
-            colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }} // added
+            colors={isDashboard ? { datum: "color" } : [colors.accent.gold, colors.accent.tan, colors.grey[200]]}
             margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
             xScale={{ type: "point" }}
             yScale={{
@@ -66,17 +66,17 @@ export default function LineChart({
                 tickSize: 0,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: isDashboard ? undefined : "transportation", // added
+                legend: isDashboard ? undefined : "transportation",
                 legendOffset: 36,
                 legendPosition: "middle",
             }}
             axisLeft={{
                 orient: "left",
-                tickValues: 5, // added
+                tickValues: 5,
                 tickSize: 3,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: isDashboard ? undefined : "count", // added
+                legend: isDashboard ? undefined : "count",
                 legendOffset: -40,
                 legendPosition: "middle",
             }}

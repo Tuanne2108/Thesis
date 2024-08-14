@@ -13,27 +13,27 @@ export default function PieChart() {
                 axis: {
                     domain: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                         },
                     },
                     legend: {
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                     ticks: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.grey[200],
                             strokeWidth: 1,
                         },
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.grey[200],
                         },
                     },
                 },
                 legends: {
                     text: {
-                        fill: colors.grey[100],
+                        fill: colors.grey[200],
                     },
                 },
             }}
@@ -47,7 +47,7 @@ export default function PieChart() {
                 modifiers: [["darker", 0.2]],
             }}
             arcLinkLabelsSkipAngle={10}
-            arcLinkLabelsTextColor={colors.grey[100]}
+            arcLinkLabelsTextColor={colors.grey[200]}
             arcLinkLabelsThickness={2}
             arcLinkLabelsColor={{ from: "color" }}
             enableArcLabels={false}
@@ -57,6 +57,7 @@ export default function PieChart() {
                 from: "color",
                 modifiers: [["darker", 2]],
             }}
+            colors={[colors.accent.gold, colors.accent.tan, colors.primary[800], colors.accent.cream]}
             defs={[
                 {
                     id: "dots",
@@ -87,7 +88,7 @@ export default function PieChart() {
                     itemsSpacing: 0,
                     itemWidth: 100,
                     itemHeight: 18,
-                    itemTextColor: "#999",
+                    itemTextColor: colors.grey[200],
                     itemDirection: "left-to-right",
                     itemOpacity: 1,
                     symbolSize: 18,
@@ -96,7 +97,7 @@ export default function PieChart() {
                         {
                             on: "hover",
                             style: {
-                                itemTextColor: "#000",
+                                itemTextColor: colors.primary[600],
                             },
                         },
                     ],
