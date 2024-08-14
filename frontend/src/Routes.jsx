@@ -48,8 +48,8 @@ function AppRoutes() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/seller-sign-up" element={<SellerSignUp />} />
-                <Route path="/seller-dashboard" element={<SellerDashboard />} />
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/seller-dashboard/*" element={<SellerDashboard />} />
+                <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

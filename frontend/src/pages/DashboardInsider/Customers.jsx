@@ -5,9 +5,9 @@ import { mockDataTeam } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import Header from "../../components/Header";
+import Header from "../../components/dashboard/Header";
 
-const Team = () => {
+const Customers = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const columns = [
@@ -106,4 +106,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default Customers;

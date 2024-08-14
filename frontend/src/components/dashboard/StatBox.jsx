@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Box, Typography, useTheme } from "@mui/material";
-import { tokens } from "../theme";
+import { tokens } from "../../theme";
 import ProgressCircle from "./ProgressCircle";
 
 export default function StatBox({ title, subtitle, icon, progress, increase }) {

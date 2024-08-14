@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
-import { tokens } from "../theme";
-import { mockLineData as data } from "../data/mockData";
+import { tokens } from "../../theme";
+import { mockLineData as data } from "../../data/mockData";
 
 export default function LineChart({
     isCustomLineColors = false,
