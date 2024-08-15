@@ -146,7 +146,7 @@ export default function Profile() {
                         This information will be displayed publicly, so be
                         careful what you share.
                     </p>
-
+                    setCurrentProduct(product);
                     <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Username */}
                         <div className="md:col-span-1">
@@ -239,7 +239,7 @@ export default function Profile() {
                                 type="text"
                                 autoComplete="address-level2"
                                 onChange={handleOnChange}
-                                defaultValue={formData.city} // assuming formData.city exists
+                                defaultValue={formData.city}
                                 className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
@@ -257,7 +257,7 @@ export default function Profile() {
                                 type="text"
                                 autoComplete="address-level1"
                                 onChange={handleOnChange}
-                                defaultValue={formData.region} // assuming formData.region exists
+                                defaultValue={formData.region}
                                 className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>
@@ -275,7 +275,7 @@ export default function Profile() {
                                 type="text"
                                 autoComplete="street-address"
                                 onChange={handleOnChange}
-                                defaultValue={formData.streetAddress} // assuming formData.streetAddress exists
+                                defaultValue={formData.streetAddress}
                                 className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-gray-800 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600"
                             />
                         </div>

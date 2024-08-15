@@ -38,7 +38,7 @@ export const ImageUploader = ({
 
     const handleUploadFile = async (file) => {
         const storage = getStorage();
-        const fileName = new Date().getTime() + file.name;
+        const fileName = `avatar/${file.name}`;
         const storageRef = ref(storage, fileName);
         const uploadTask = uploadBytesResumable(storageRef, file);
 

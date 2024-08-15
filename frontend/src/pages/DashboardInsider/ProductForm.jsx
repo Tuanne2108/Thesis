@@ -59,7 +59,7 @@ const ProductForm = () => {
             const storage = getStorage();
             const uploadedImages = await Promise.all(
                 imageFileList.map((file) => {
-                    const storageRef = ref(storage, `products/${file.name}`);
+                    const storageRef = ref(storage, `product-images/${file.name}`);
                     const uploadTask = uploadBytesResumable(
                         storageRef,
                         file.originFileObj

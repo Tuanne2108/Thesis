@@ -15,12 +15,43 @@ export const getProductsBySeller = async (sellerId) => {
     }
 };
 
+export const updateProduct = async (productId, productData) => {
+    try {
+        const response = await productApi.put(
+            `/update-product/${productId}`,
+            productData
+        );
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error("An unexpected error occurred");
+        }
+    }
+};
+
 export const createProduct = async (sellerId, productData) => {
     try {
         const response = await productApi.post(`/create-product`, {
             ...productData,
             sellerId,
         });
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error("An unexpected error occurred");
+        }
+    }
+};
+
+export const deleteProduct = async (productId) => {
+    try {
+        const response = await productApi.delete(
+            `/delete-product/${productId}`
+        );
         return response.data;
     } catch (error) {
         if (error.response) {
