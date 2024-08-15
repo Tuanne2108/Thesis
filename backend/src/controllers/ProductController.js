@@ -39,7 +39,23 @@ const getProductById = async (req, res) => {
         });
     }
 };
-
+const getProductsBySellerId = async (req, res) => {
+    try {
+        const { sellerId } = req.params;
+        const products = await Product.find({ sellerId: sellerId });
+        res.status(200).json({
+            status: "success",
+            message: "Products retrieved successfully",
+            data: products,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "An unexpected error occurred",
+            data: null,
+        });
+    }
+};
 const createProduct = async (req, res) => {
     const {
         name,
@@ -62,7 +78,7 @@ const createProduct = async (req, res) => {
             name,
             sellerId: req.user._id,
         });
-        
+
         if (existingProduct) {
             return res.status(409).json({
                 status: "error",
@@ -162,6 +178,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
     getProducts,
     getProductById,
+    getProductsBySellerId,
     createProduct,
     updateProduct,
     deleteProduct,

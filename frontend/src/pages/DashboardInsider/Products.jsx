@@ -1,109 +1,145 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, IconButton, useTheme } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import { useSelector } from "react-redux";
 import Header from "../../components/dashboard/Header";
+import * as productApi from "../../api/ProductApi";
 
 const Products = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const columns = [
-    { field: "id", headerName: "ID" },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    {
-      field: "phone",
-      headerName: "Phone Number",
-      flex: 1,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-    },
-    {
-      field: "accessLevel",
-      headerName: "Access Level",
-      flex: 1,
-      renderCell: ({ row: { access } }) => {
-        return (
-          <Box
-            width="60%"
-            m="0 auto"
-            p="5px"
-            display="flex"
-            justifyContent="center"
-            backgroundColor={
-              access === "admin"
-                ? colors.accent.gold
-                : access === "manager"
-                ? colors.accent.tan
-                : colors.primary[300]
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const currentUser = useSelector((state) => state.user.currentUser);
+    const [products, setProducts] = useState([]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await productApi.getProductsBySeller(
+                    currentUser._id
+                );
+                setProducts(response.data);
+            } catch (error) {
+                console.error("Error fetching products:", error);
             }
-            borderRadius="4px"
-          >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
-            {access === "user" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[900]} sx={{ ml: "5px" }}>
-              {access}
-            </Typography>
-          </Box>
-        );
-      },
-    },
-  ];
-
-  return (
-    <Box m="20px">
-      <Header title="PRODUCTS" subtitle="Managing Products" />
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.accent.tan,
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.primary[600], 
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.primary[600],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.accent.gold} !important`,
-          },
-        }}
-      >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
-      </Box>
-    </Box>
-  );
+        };
+        if (currentUser && currentUser._id) {
+            fetchProducts();
+        }
+    }, [currentUser]);
+    console.log("Products fetched", products);
+    const handleDelete = async (productId) => {};
+    const handleEdit = (productId) => {};
+    const columns = [
+        {
+            field: "images",
+            headerName: "Thumbnail",
+            flex: 1,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="100%"
+                    height="100%">
+                    <img
+                        src={params.value}
+                        alt="product-thumbnail"
+                        style={{
+                            width: 50,
+                            height: 50,
+                            objectFit: "cover",
+                            borderRadius: "5px",
+                        }}
+                    />
+                </Box>
+            ),
+        },
+        { field: "name", headerName: "Name", flex: 1 },
+        { field: "category", headerName: "Category", flex: 1 },
+        { field: "price", headerName: "Price", type: "number", flex: 1 },
+        {
+            field: "quantity",
+            headerName: "Quantity",
+            type: "number",
+            flex: 1,
+            renderCell: (params) => params.row.inventory.quantity,
+        },
+        {
+            field: "reserved",
+            headerName: "Reserved",
+            type: "number",
+            flex: 1,
+            renderCell: (params) => params.row.inventory.reserved,
+        },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="100%"
+                    height="100%">
+                    <IconButton onClick={() => handleEdit(params.row._id)}>
+                        <EditIcon />
+                    </IconButton>
+                    <IconButton
+                        color="warning"
+                        onClick={() => handleDelete(params.row._id)}>
+                        <DeleteIcon />
+                    </IconButton>
+                </Box>
+            ),
+        },
+    ];
+    return (
+        <Box m="20px">
+            <Header title="PRODUCTS" subtitle="Managing Products" />
+            <Box
+                m="40px 0 0 0"
+                height="75vh"
+                sx={{
+                    "& .MuiDataGrid-root": {
+                        border: "none",
+                    },
+                    "& .MuiDataGrid-cell": {
+                        borderBottom: "none",
+                    },
+                    "& .name-column--cell": {
+                        color: colors.accent.tan,
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                        backgroundColor: colors.primary[600],
+                        borderBottom: "none",
+                    },
+                    "& .MuiDataGrid-virtualScroller": {
+                        backgroundColor: colors.primary[400],
+                    },
+                    "& .MuiDataGrid-footerContainer": {
+                        borderTop: "none",
+                        backgroundColor: colors.primary[600],
+                    },
+                    "& .MuiCheckbox-root": {
+                        color: `${colors.accent.gold} !important`,
+                    },
+                }}>
+                <DataGrid
+                    rows={products}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    autoPageSize={true}
+                    rowHeight={70}
+                    checkboxSelection
+                />
+            </Box>
+        </Box>
+    );
 };
 
 export default Products;

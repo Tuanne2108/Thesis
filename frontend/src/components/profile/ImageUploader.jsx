@@ -21,6 +21,7 @@ export const ImageUploader = ({
     const [uploading, setUploading] = useState(false);
     const [uploadComplete, setUploadComplete] = useState(false);
     const [uploadError, setUploadError] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(currentUser.avatar || "");
 
     useEffect(() => {
         if (file) {
@@ -59,6 +60,7 @@ export const ImageUploader = ({
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+                    setPreviewUrl(downloadUrl);
                     setFormData({ ...formData, avatar: downloadUrl });
                     setUploading(false);
                     setUploadComplete(true);
@@ -69,10 +71,10 @@ export const ImageUploader = ({
 
     return (
         <div className="flex flex-col items-center">
-            {currentUser ? (
+            {previewUrl ? (
                 <img
                     className="object-cover h-40 w-40 ring-2 ring-black rounded-full"
-                    src={currentUser.avatar}
+                    src={previewUrl}
                     alt="user avatar"
                 />
             ) : (
