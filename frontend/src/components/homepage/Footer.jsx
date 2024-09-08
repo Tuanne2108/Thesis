@@ -18,9 +18,10 @@ export const Footer = () => {
     return (
         <footer className="bg-gray-900 text-gray-400 py-12">
             <div className="container mx-auto px-4">
-                <div className="flex flex-col md:flex-row justify-between items-start space-y-8 md:space-y-0">
+                {/* Footer Sections */}
+                <div className="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-16">
                     {/* Logo */}
-                    <div className="mb-8 flex justify-center md:justify-start">
+                    <div className="mb-8 flex justify-center">
                         <svg
                             className="w-10 h-10 text-indigo-500"
                             fill="currentColor"
@@ -31,42 +32,7 @@ export const Footer = () => {
                     </div>
 
                     {/* Links Section */}
-                    <div className="flex flex-wrap justify-center md:justify-end space-x-16">
-                        <div>
-                            <h4 className="text-white text-lg font-bold mb-4">
-                                Solutions
-                            </h4>
-                            <ul className="space-y-2">
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Marketing
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Analytics
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Commerce
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Insights
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                    <div className="flex flex-wrap justify-center space-x-12">
                         <div>
                             <h4 className="text-white text-lg font-bold mb-4">
                                 Support
@@ -76,70 +42,28 @@ export const Footer = () => {
                                     <a
                                         href="#"
                                         className="hover:text-white transition">
-                                        Pricing
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Documentation
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Guides
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        API Status
+                                        Contact Us
                                     </a>
                                 </li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="text-white text-lg font-bold mb-4">
-                                Company
+                                Itineraries
                             </h4>
                             <ul className="space-y-2">
                                 <li>
                                     <a
                                         href="#"
                                         className="hover:text-white transition">
-                                        About
+                                        Community Trips
                                     </a>
                                 </li>
                                 <li>
                                     <a
                                         href="#"
                                         className="hover:text-white transition">
-                                        Blog
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Jobs
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Press
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Partners
+                                        Find Destinations
                                     </a>
                                 </li>
                             </ul>
@@ -153,21 +77,14 @@ export const Footer = () => {
                                     <a
                                         href="#"
                                         className="hover:text-white transition">
-                                        Claim
+                                        Terms and Conditions
                                     </a>
                                 </li>
                                 <li>
                                     <a
                                         href="#"
                                         className="hover:text-white transition">
-                                        Privacy
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="hover:text-white transition">
-                                        Terms
+                                        Privacy Policy
                                     </a>
                                 </li>
                             </ul>
@@ -175,8 +92,7 @@ export const Footer = () => {
                     </div>
                 </div>
 
-                {/* Newsletter */}
-                <div className="border-t border-gray-700 mt-12 pt-8">
+                <div className="border-t border-gray-700 mt-12 pt-8 text-center">
                     <h4 className="text-white text-lg font-bold mb-4">
                         Subscribe to our newsletter
                     </h4>
@@ -186,7 +102,7 @@ export const Footer = () => {
                     </p>
                     <form
                         onSubmit={handleSubscribe}
-                        className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-4">
+                        className="flex flex-col md:flex-row justify-center items-center gap-4">
                         <input
                             type="email"
                             value={email}
@@ -204,7 +120,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Social Media Icons */}
-                <div className="flex justify-center md:justify-start space-x-6 mt-8">
+                <div className="flex justify-center space-x-6 mt-8">
                     <a href="#" className="hover:text-white transition">
                         <FontAwesomeIcon icon={faFacebook} className="mr-2" />
                     </a>

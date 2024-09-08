@@ -1,49 +1,50 @@
-import React from "react";
-import { HeroSection } from "../components/homepage/HeroSection";
-import { FeaturedCategories } from "../components/homepage/FeaturedCategories";
-import { NewArrivals } from "../components/homepage/NewArrivals";
-import { BrandStory } from "../components/homepage/BrandStory";
-import { SpecialOffers } from "../components/homepage/SpecialOffers";
-import { SocialMediaFeed } from "../components/homepage/SocialMediaFeed";
+import React, { useEffect } from "react";
+import { Features } from "../components/homepage/Features";
+import { HowItWorks } from "../components/homepage/HowItWorks";
+import { Partners } from "../components/homepage/Partners";
 import { Footer } from "../components/homepage/Footer";
-
-const newArrivals = [
-    {
-        id: 1,
-        name: "Classic Sneakers",
-        price: 59.99,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 2,
-        name: "Leather Boots",
-        price: 89.99,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 3,
-        name: "Running Shoes",
-        price: 74.99,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 4,
-        name: "Formal Shoes",
-        price: 99.99,
-        image: "https://via.placeholder.com/150",
-    },
-];
+import { HeroSection } from "../components/homepage/HeroSection";
+import { Testimonial } from "../components/homepage/Testimonials";
+import { JourneyInspiration } from "../components/homepage/JourneyInspiration";
+import { CustomizedItineraries } from "../components/homepage/CustomizedItineraries";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const HomePage = () => {
+    useEffect(() => {
+        AOS.init({
+            duration: 800,
+            easing: "ease-in-out-sine",
+            once: false,
+        });
+    }, []);
+
     return (
         <div>
-            <HeroSection />
-            <FeaturedCategories />
-            <NewArrivals products={newArrivals} />
-            <BrandStory />
-            <SpecialOffers />
-            <SocialMediaFeed />
-            <Footer />
+            <div>
+                <HeroSection />
+            </div>
+            <div data-aos="fade-up">
+                <HowItWorks />
+            </div>
+            <div data-aos="zoom-in">
+                <Features />
+            </div>
+            <div data-aos="flip-left">
+                <Testimonial />
+            </div>
+            <div data-aos="fade-left">
+                <Partners />
+            </div>
+            <div data-aos="fade-up">
+                <JourneyInspiration />
+            </div>
+            <div data-aos="fade-right">
+                <CustomizedItineraries />
+            </div>
+            <div>
+                <Footer />
+            </div>
         </div>
     );
 };

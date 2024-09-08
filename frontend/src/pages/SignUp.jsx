@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import * as AuthApi from "../api/AuthApi";
 
 export default function SignUp() {
-    const [formData, setFormData] = useState({role: "customer"});
+    const [formData, setFormData] = useState({ role: "customer" });
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -47,11 +47,9 @@ export default function SignUp() {
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <div className="w-full max-w-md p-6 space-y-8 bg-white rounded-lg shadow-md">
                 <div className="text-center">
-                    <img
-                        alt=""
-                        src="https://static.vecteezy.com/system/resources/previews/008/956/590/original/creative-abstract-black-silhouette-running-shoe-design-logo-design-template-free-vector.jpg"
-                        className="mx-auto h-20 w-auto"
-                    />
+                    <span className="text-purple-500 font-bold text-3xl">
+                        TRAVELxAI
+                    </span>
                     <h2 className="mt-6 text-2xl font-bold text-gray-900">
                         Register your account
                     </h2>

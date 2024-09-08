@@ -1,17 +1,40 @@
 import { Box, IconButton, useTheme } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../theme";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import ExitToAppOutlinedIcon from "@mui/icons-material/ExitToAppOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import * as AuthApi from "../../api/AuthApi";
+import {
+    signOutStart,
+    signOutSuccess,
+    signOutFailure,
+} from "../../redux/user/UserSlice";
 
 export default function Topbar() {
     const theme = useTheme();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const colors = tokens(theme.palette.mode);
     const colorMode = useContext(ColorModeContext);
+
+    const handleSignOut = async () => {
+        try {
+            dispatch(signOutStart());
+            const res = await AuthApi.signOut();
+            if (res.status === "success") {
+                dispatch(signOutSuccess("Signed out successfully"));
+                navigate("/sign-in");
+            }
+        } catch (error) {
+            dispatch(signOutFailure(error.message));
+        }
+    };
 
     return (
         <Box display="flex" justifyContent="space-between" p={2}>
@@ -34,16 +57,20 @@ export default function Topbar() {
             <Box display="flex">
                 <IconButton onClick={colorMode.toggleColorMode}>
                     {theme.palette.mode === "dark" ? (
-                        <DarkModeOutlinedIcon sx={{ color: colors.accent.gold }}/>
+                        <DarkModeOutlinedIcon
+                            sx={{ color: colors.accent.gold }}
+                        />
                     ) : (
-                        <LightModeOutlinedIcon sx={{ color: colors.accent.tan }}/>
+                        <LightModeOutlinedIcon
+                            sx={{ color: colors.accent.tan }}
+                        />
                     )}
                 </IconButton>
                 <IconButton>
                     <NotificationsOutlinedIcon />
                 </IconButton>
-                <IconButton>
-                    <SettingsOutlinedIcon />
+                <IconButton onClick={handleSignOut}>
+                    <ExitToAppOutlinedIcon />
                 </IconButton>
             </Box>
         </Box>

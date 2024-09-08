@@ -1,49 +1,75 @@
-import React from 'react';
+import React from "react";
+import { FaQuoteLeft } from "react-icons/fa";
 
-export const Testimonials = () => {
-  const testimonials = [
-    {
-      name: 'John Doe',
-      image: 'https://via.placeholder.com/100', // Replace with your image URL
-      text: 'The sneakers I bought are amazing! Comfortable and stylish.',
-    },
-    {
-      name: 'Jane Smith',
-      image: 'https://via.placeholder.com/100', // Replace with your image URL
-      text: 'Excellent quality and fast delivery. I love my new boots!',
-    },
-    {
-      name: 'Mark Wilson',
-      image: 'https://via.placeholder.com/100', // Replace with your image URL
-      text: 'Great customer service and awesome collection of formal shoes.',
-    },
-  ];
+export const Testimonial = () => {
+    const testimonials = [
+        {
+            name: "David Jordan",
+            role: "Digital Nomad",
+            review: "Trip Planner AI saves time and stress by aiding travel planning, relieving indecision or uncertainty.",
+            rating: 5,
+            image: "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
+            backgroundColor: "bg-pink-100",
+        },
+        {
+            name: "Tushar",
+            role: "Student",
+            review: "Trip Planner AI offers diverse planning options in a user-friendly interface. Simplifies travel planning for enthusiasts.",
+            rating: 5,
+            image: "https://w7.pngwing.com/pngs/4/736/png-transparent-female-avatar-girl-face-woman-user-flat-classy-users-icon.png",
+            backgroundColor: "bg-blue-100",
+        },
+        {
+            name: "Steve J",
+            role: "Student",
+            review: "I love traveling but hate planning. This app quickly organizes trip agendas, reducing decision fatigue.",
+            rating: 5,
+            image: "https://w7.pngwing.com/pngs/364/361/png-transparent-account-avatar-profile-user-avatars-icon-thumbnail.png",
+            backgroundColor: "bg-green-100",
+        },
+    ];
 
-  return (
-    <section className="py-12 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          What Our Customers Say
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.name}
-              className="flex flex-col items-center text-center p-6 bg-white border rounded-lg shadow-md hover:shadow-lg transition"
-            >
-              <img
-                src={testimonial.image}
-                alt={testimonial.name}
-                className="w-24 h-24 object-cover mb-4 rounded-full"
-              />
-              <h3 className="text-lg font-semibold text-gray-700">
-                {testimonial.name}
-              </h3>
-              <p className="text-gray-600 mt-2 italic">"{testimonial.text}"</p>
+    return (
+        <section className="py-16 text-center bg-gradient-to-r from-blue-200 to-blue-100">
+            <h2 className="text-4xl font-bold mb-8">
+                Don't take our word for it
+            </h2>
+            <p className="text-lg text-gray-600 mb-12">
+                See what our users have to say about revolutionizing their
+                travel experiences with Trip Planner AI.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-8">
+                {testimonials.map((testimonial, index) => (
+                    <div
+                        key={index}
+                        className={`max-w-sm p-6 rounded-lg shadow-lg transform transition-transform duration-200 hover:scale-105 ${testimonial.backgroundColor}`}>
+                        <FaQuoteLeft
+                            size={30}
+                            className="text-purple-500 absolute top-6 left-6"
+                        />
+                        <div className="flex items-center mb-4">
+                            <img
+                                src={testimonial.image}
+                                alt={testimonial.name}
+                                className="w-16 h-16 rounded-full object-cover mr-4"
+                            />
+                            <div>
+                                <h3 className="text-lg font-bold">
+                                    {testimonial.name}
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                    {testimonial.role}
+                                </p>
+                            </div>
+                        </div>
+                        <p className="text-gray-700 mb-4">
+                            {testimonial.review}
+                        </p>
+                        <div>{"⭐".repeat(testimonial.rating)}</div>
+                    </div>
+                ))}
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    );
 };
