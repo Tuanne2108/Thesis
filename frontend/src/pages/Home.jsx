@@ -24,22 +24,22 @@ const HomePage = () => {
             <div>
                 <HeroSection />
             </div>
-            <div data-aos="fade-up">
+            <div>
                 <HowItWorks />
             </div>
-            <div data-aos="zoom-in">
+            <div>
                 <Features />
             </div>
-            <div data-aos="flip-left">
+            <div>
                 <Testimonial />
             </div>
-            <div data-aos="fade-left">
+            <div>
                 <Partners />
             </div>
-            <div data-aos="fade-up">
+            <div>
                 <JourneyInspiration />
             </div>
-            <div data-aos="fade-right">
+            <div>
                 <CustomizedItineraries />
             </div>
             <div>

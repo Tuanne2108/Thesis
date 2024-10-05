@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@langchain/core": "^0.3.3",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.3.2"
+  }
+}
