@@ -4,13 +4,10 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Contact from "./pages/Contact";
-import SellerSignUp from "./pages/SellerSignUp";
-import SellerDashboard from "./pages/SellerDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import ChatInterface from "./pages/ChatInterface";
 
 import Header from "./components/Header";
 
@@ -21,11 +18,9 @@ function AppRoutes() {
     const hideHeaderPaths = [
         "/sign-in",
         "/sign-up",
-        "/seller-sign-up",
-        "/seller-dashboard",
-        "/admin-dashboard",
+        "/chat",
     ];
-    const validPaths = ["/", "/about", "/cart", "/profile", "/contact"];
+    const validPaths = ["/", "/about", "/profile", "/contact"];
     const isValidPath = validPaths.includes(location.pathname);
 
     useEffect(() => {
@@ -42,14 +37,11 @@ function AppRoutes() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/cart" element={<Cart />} />
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/seller-sign-up" element={<SellerSignUp />} />
-                <Route path="/seller-dashboard/*" element={<SellerDashboard />} />
-                <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
+                <Route path="/chat" element={<ChatInterface />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

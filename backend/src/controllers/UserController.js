@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const Seller = require("../models/Seller");
 const updateUser = async (req, res) => {
     if (req.user.id !== req.params.id) {
         return res.status(403).json({

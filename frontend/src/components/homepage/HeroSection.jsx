@@ -1,5 +1,10 @@
 import heroBg from "../../assets/hero-bg.jpg";
+import { useNavigate } from "react-router-dom";
 export const HeroSection = () => {
+    const navigate = useNavigate();
+    const directToChat = () => {
+        navigate("/chat");
+    };
     return (
         <div className="relative">
             <img src={heroBg} className="w-full h-screen object-cover" />
@@ -13,7 +18,9 @@ export const HeroSection = () => {
                     planner.
                 </p>
                 <div className="space-x-4">
-                    <button className="bg-purple-500 text-black py-3 px-6 rounded-lg text-lg hover:bg-purple-400 transition">
+                    <button
+                        className="bg-purple-500 text-black py-3 px-6 rounded-lg text-lg hover:bg-purple-400 transition"
+                        onClick={directToChat}>
                         🗺️ Start Your Journey
                     </button>
                 </div>
