@@ -11,14 +11,30 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.15.0",
+    "@elastic/elasticsearch-serverless": "^0.7.0",
+    "@google/generative-ai": "^0.21.0",
+    "@langchain/community": "^0.3.5",
+    "@langchain/core": "^0.3.10",
+    "@langchain/google-genai": "^0.1.0",
+    "@langchain/openai": "^0.3.7",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cheerio": "^1.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "d3-dsv": "^2.0.0",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "elasticsearch": "^16.7.3",
+    "express": "^4.21.1",
+    "get-json": "^1.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.2",
-    "nodemon": "^3.1.4"
+    "langchain": "^0.3.2",
+    "mongoose": "^8.7.1",
+    "nodemon": "^3.1.4",
+    "pdf-parse": "^1.1.1",
+    "puppeteer": "^23.6.0"
   }
 }

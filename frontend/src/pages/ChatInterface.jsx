@@ -68,7 +68,7 @@ const ChatInterface = () => {
                                 currentUser.name
                             </h2>
                         )}
-                    </div>)}
+                    </div>): null}
 
                     <nav className="flex flex-col space-y-4 w-full">
                         <a
