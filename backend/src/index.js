@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { connectMongoDB } = require('./config/database');
-const ragApi = require('./api/ragApi');
-const mongoose = require("mongoose");
+const { connectMongoDB } = require('./config/mongoDb');
 const bodyParser = require("body-parser");
 const routes = require("./routes");
 const dotenv = require("dotenv");
@@ -28,5 +26,4 @@ app.use(bodyParser.urlencoded({ extended: true }));
 routes(app);
 
 connectMongoDB();
-app.use('/api', ragApi);
 app.listen(port, () => console.log(`Server running on port ${port}`));

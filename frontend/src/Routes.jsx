@@ -10,16 +10,13 @@ import Contact from "./pages/Contact";
 import ChatInterface from "./pages/ChatInterface";
 
 import Header from "./components/Header";
+import ChatbotTest from "./pages/ChatbotTest";
 
 function AppRoutes() {
     const location = useLocation();
     const [showHeader, setShowHeader] = useState(true);
 
-    const hideHeaderPaths = [
-        "/sign-in",
-        "/sign-up",
-        "/chat",
-    ];
+    const hideHeaderPaths = ["/sign-in", "/sign-up", "/chat"];
     const validPaths = ["/", "/about", "/profile", "/contact"];
     const isValidPath = validPaths.includes(location.pathname);
 
@@ -42,6 +39,7 @@ function AppRoutes() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/chat" element={<ChatInterface />} />
+                <Route path="/chat-test" element={<ChatbotTest />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>
