@@ -17,6 +17,22 @@ export default function SignUp() {
         });
     };
 
+    const sendCustomerIp = async () => {
+        try {
+            const response = await fetch('/api/send-ip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: formData.email }),
+            });
+            const result = await response.json();
+            console.log('Response from Node.js:', result);
+        } catch (error) {
+            console.error('Error sending IP:', error);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -26,6 +42,7 @@ export default function SignUp() {
                 password: formData.password,
                 confirmedPassword: formData.confirmedPassword,
             });
+            await sendCustomerIp();
             notification.success({
                 placement: "top",
                 message: "Success",

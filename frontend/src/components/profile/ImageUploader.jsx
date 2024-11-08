@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import { Flex, Progress } from "antd";
 import { useState, useRef, useEffect } from "react";
-import {
-    getDownloadURL,
-    getStorage,
-    ref,
-    uploadBytesResumable,
-} from "firebase/storage";
+// import {
+//     getDownloadURL,
+//     getStorage,
+//     ref,
+//     uploadBytesResumable,
+// } from "firebase/storage";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 export const ImageUploader = ({
@@ -23,11 +23,11 @@ export const ImageUploader = ({
     const [uploadError, setUploadError] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(currentUser.avatar || "");
 
-    useEffect(() => {
-        if (file) {
-            handleUploadFile(file);
-        }
-    }, [file]);
+    // useEffect(() => {
+    //     if (file) {
+    //         handleUploadFile(file);
+    //     }
+    // }, [file]);
 
     useEffect(() => {
         if (clearUploadFlags) {
@@ -36,38 +36,38 @@ export const ImageUploader = ({
         }
     }, [clearUploadFlags]);
 
-    const handleUploadFile = async (file) => {
-        const storage = getStorage();
-        const fileName = `avatar/${file.name}`;
-        const storageRef = ref(storage, fileName);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+    // const handleUploadFile = async (file) => {
+    //     const storage = getStorage();
+    //     const fileName = `avatar/${file.name}`;
+    //     const storageRef = ref(storage, fileName);
+    //     const uploadTask = uploadBytesResumable(storageRef, file);
 
-        setUploading(true);
-        setUploadComplete(false);
-        setUploadError(false);
+    //     setUploading(true);
+    //     setUploadComplete(false);
+    //     setUploadError(false);
 
-        uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-                const progress =
-                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setFilePercent(Math.round(progress));
-            },
-            (error) => {
-                console.error("An error occurred: ", error);
-                setUploadError(true);
-                setUploading(false);
-            },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
-                    setPreviewUrl(downloadUrl);
-                    setFormData({ ...formData, avatar: downloadUrl });
-                    setUploading(false);
-                    setUploadComplete(true);
-                });
-            }
-        );
-    };
+    //     uploadTask.on(
+    //         "state_changed",
+    //         (snapshot) => {
+    //             const progress =
+    //                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //             setFilePercent(Math.round(progress));
+    //         },
+    //         (error) => {
+    //             console.error("An error occurred: ", error);
+    //             setUploadError(true);
+    //             setUploading(false);
+    //         },
+    //         () => {
+    //             getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+    //                 setPreviewUrl(downloadUrl);
+    //                 setFormData({ ...formData, avatar: downloadUrl });
+    //                 setUploading(false);
+    //                 setUploadComplete(true);
+    //             });
+    //         }
+    //     );
+    // };
 
     return (
         <div className="flex flex-col items-center">

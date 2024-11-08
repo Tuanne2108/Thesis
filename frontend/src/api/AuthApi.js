@@ -1,7 +1,11 @@
 import { authApi } from ".";
-export const signIn = async (user) => {
+export const signIn = async () => {
     try {
-        const response = await authApi.post("/sign-in", user);
+        const response = await authApi.post("/sign-in", {}, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
         return response.data;
     } catch (error) {
         if (error.response) {
@@ -11,6 +15,7 @@ export const signIn = async (user) => {
         }
     }
 };
+
 export const signUp = async (user) => {
     try {
         const response = await authApi.post("/sign-up", user);

@@ -10,9 +10,9 @@ const cookieParser = require("cookie-parser");
 dotenv.config();
 
 const app = express();
-const port = process.env.API_PORT;
+const port = process.env.API_PORT||3000;
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://thesis-3v13-git-test-ip-tuannes-projects.vercel.app",
     credentials: true,
 };
 
@@ -25,5 +25,5 @@ app.use(express.urlencoded({ limit: "200mb", extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 routes(app);
 
-connectMongoDB();
+// connectMongoDB();
 app.listen(port, () => console.log(`Server running on port ${port}`));

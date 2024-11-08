@@ -47,47 +47,18 @@ const signUp = async (req, res) => {
     }
 };
 
+// const capture = async (req, res) => {
+//     const { ip } = req.body;
+//   console.log("Received IP address:", ip);
+//   res.status(200).json({ message: "IP address received", ip });
+// }
 const signIn = async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res
-                .status(401)
-                .json({ message: "Invalid email or password" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ message: "Password is incorrect!" });
-        }
-
-        const accessToken = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRATION }
-        );
-        const refreshToken = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
-        );
-        res.cookie("access_token", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-        });
-        res.cookie("refresh_token", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-        });
-        const { password: pass, ...rest } = user._doc;
+        const customerIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         return res.status(200).json({
             status: "success",
             message: "User logged in successfully",
-            data: rest,
+            data: customerIp,
         });
     } catch (err) {
         return res.status(500).json({

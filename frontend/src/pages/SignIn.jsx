@@ -9,7 +9,7 @@ import {
     signInFailure,
 } from "../redux/user/UserSlice";
 import * as AuthApi from "../api/AuthApi";
-import OAuth from "../components/OAuth";
+// import OAuth from "../components/OAuth";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -137,7 +137,7 @@ export default function SignIn() {
                     </p>
                 </div>
 
-                <OAuth />
+               
             </div>
         </div>
     );
