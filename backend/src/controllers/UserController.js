@@ -1,5 +1,6 @@
-const User = require("../models/User");
-const updateUser = async (req, res) => {
+import User from '../models/User.js';
+
+export const updateUser = async (req, res) => {
     if (req.user.id !== req.params.id) {
         return res.status(403).json({
             status: "error",
@@ -46,7 +47,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     if (req.user.id !== req.params.id) {
         return res.status(403).json({
             status: "error",
@@ -68,7 +69,7 @@ const deleteUser = async (req, res) => {
     }
 };
 
-const becomeSeller = async (req, res) => {
+export const becomeSeller = async (req, res) => {
     try {
         const { userId, shopName, shopAddress, contactNumber, description } =
             req.body;
@@ -103,5 +104,3 @@ const becomeSeller = async (req, res) => {
         });
     }
 };
-
-module.exports = { updateUser, deleteUser, becomeSeller };

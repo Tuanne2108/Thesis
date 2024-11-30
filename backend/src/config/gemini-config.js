@@ -1,4 +1,13 @@
-const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
+import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { TaskType } from '@google/generative-ai';
+
+const embeddings = new GoogleGenerativeAIEmbeddings({
+    model: "text-embedding-004",
+    apiKey: "AIzaSyBPZjudnDUgz5p4sCdHq5kZk4uSvGuS24o",
+    taskType: TaskType.RETRIEVAL_DOCUMENT,
+    title: "Document title",
+});
 
 const geminiModel = new ChatGoogleGenerativeAI({
     model: "gemini-pro",
@@ -6,4 +15,4 @@ const geminiModel = new ChatGoogleGenerativeAI({
     maxOutputTokens: 2048,
 });
 
-module.exports = { geminiModel };
+export { embeddings, geminiModel };

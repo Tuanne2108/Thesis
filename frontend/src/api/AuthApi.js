@@ -32,7 +32,7 @@ export const googleSignIn = async (user) => {
         if (error.response) {
             throw new Error(error.response.data.message);
         } else {
-            throw new Error("An unexpected error occurred");
+            throw new Error("An error occurred");
         }
     }
 };

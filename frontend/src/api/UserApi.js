@@ -26,15 +26,3 @@ export const deleteUser = async (userId) => {
     }
 };
 
-export const becomeSeller = async (sellerData) => {
-    try {
-        const response = await userApi.post("/become-seller", sellerData);
-        return response.data;
-    } catch (error) {
-        if (error.response) {
-            throw new Error(error.response.data.message);
-        } else {
-            throw new Error("An unexpected error occurred");
-        }
-    }
-};

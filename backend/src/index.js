@@ -1,13 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const { connectMongoDB } = require('./config/mongoDb');
-const bodyParser = require("body-parser");
-const routes = require("./routes");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-
-dotenv.config();
+import 'dotenv/config';
+import express from 'express';
+import { connectMongoDB } from './config/mongoDb.js';
+import bodyParser from 'body-parser';
+import routes from './routes/index.js';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = process.env.API_PORT;

@@ -1,8 +1,12 @@
-const express = require("express");
+import express from 'express';
+import * as chatController from '../controllers/ChatController.js';
+import { authenticateToken } from '../middleware/authToken.js';
+
 const router = express.Router();
-const chatController = require("../controllers/ChatController");
 
-//Request
+// Request
 router.post('/chat', chatController.handleChatRequest);
+router.get('/history', authenticateToken, chatController.getChatHistory);
+router.delete('/history', authenticateToken, chatController.clearChatHistory);
 
-module.exports = router;
+export default router;

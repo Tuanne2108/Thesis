@@ -16,3 +16,10 @@ export const userApi = axios.create({
     withCredentials: true,
 });
 
+export const chatApi = axios.create({
+    baseURL: "http://localhost:3000/api/chatbot",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    withCredentials: true,
+});

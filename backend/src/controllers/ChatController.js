@@ -1,51 +1,101 @@
-const elasticClient = require("../config/elasticDb");
-const geminiModel = require("../config/gemini-config");
-const Hotel = require("../models/hotelModel");
+import geminiModel from '../config/gemini-config.js';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import User from '../models/User.js';
+import { createError } from '../utils/error.js';
 
-const handleChatRequest = async (req, res) => {
+const systemPrompt = `You are an expert travel assistant with extensive knowledge of destinations, accommodations, and travel planning. 
+Your role is to:
+- Provide detailed travel recommendations
+- Help with itinerary planning
+- Offer insights about destinations
+- Suggest accommodations based on preferences
+- Share local customs and travel tips
+- Assist with budgeting and cost estimates
+
+Please be conversational, friendly, and provide specific, actionable advice.`;
+
+const prompt = ChatPromptTemplate.fromMessages([
+    ["system", systemPrompt],
+    ["human", "{input}"]
+]);
+
+export const handleChatRequest = async (req, res, next) => {
+    const { query } = req.body;
+    const userId = req.user?._id;
+
     try {
-        const { query } = req.body;
+        const chain = prompt.pipe(geminiModel);
 
-        // Search in Elasticsearch
-        const elasticResults = await elasticClient.search({
-            index: "hotels",
-            body: {
-                query: {
-                    multi_match: {
-                        query: query,
-                        fields: ["name", "description", "location"],
-                    },
-                },
-            },
+        const response = await chain.invoke({
+            input: query,
+            message: query,
         });
 
-        // Search in MongoDB
-        const mongoResults = await Hotel.find({ $text: { $search: query } });
+        const userMessage = {
+            role: 'user',
+            content: query
+        };
 
-        // Combine results
-        const allResults = [
-            ...elasticResults.body.hits.hits.map((hit) => hit._source),
-            ...mongoResults,
-        ];
+        const assistantMessage = {
+            role: 'assistant',
+            content: response.geminiModel.content
+        };
+        console.log('response: ' + JSON.stringify(response));
+        if (userId) {
+            await saveChatHistory(userId, userMessage, assistantMessage);
+        }
 
-        // Prepare context for Gemini
-        const context = allResults
-            .map(
-                (hotel) =>
-                    `${hotel.name}: ${hotel.description}. Địa chỉ: ${hotel.location}. Giá: ${hotel.price}. Đánh giá: ${hotel.rating}/5.`
-            )
-            .join("\n");
+        res.status(200).json({
+            success: true,
+            response: response.text,
+            messages: [userMessage, assistantMessage]
+        });
 
-        // Generate response using Gemini
-        const prompt = `Bạn là một chuyên gia du lịch. Hãy cung cấp thông tin về "${query}". Thông tin: ${context}`;
-        const result = await geminiModel.generateContent(prompt);
-        const response = result.response.text();
-
-        res.json({ response });
     } catch (error) {
         console.error("Error in chat request:", error);
-        res.status(500).json({ error: "Internal server error" });
+        next(createError(500, "Failed to process chat request"));
     }
 };
 
-module.exports = { handleChatRequest };
+export const getChatHistory = async (req, res, next) => {
+    if (!req.user) {
+        return next(createError(401, "User not authenticated"));
+    }
+
+    const userId = req.user._id;
+    console.log('userId', userId);
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return next(createError(404, "User not found"));
+        }
+
+        res.status(200).json({
+            success: true,
+            chats: user.chats,
+        });
+
+    } catch (error) {
+        console.error("Error fetching chat history:", error);
+        next(createError(500, "Failed to fetch chat history"));
+    }
+};
+
+
+export const clearChatHistory = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        await User.findByIdAndUpdate(userId, { $set: { chats: [] } });
+
+        res.status(200).json({
+            success: true,
+            message: "Chat history cleared successfully"
+        });
+
+    } catch (error) {
+        console.error("Error clearing chat history:", error);
+        next(createError(500, "Failed to clear chat history"));
+    }
+};
+export const saveChatHistory = async (chatHistory) => {};

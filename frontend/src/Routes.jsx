@@ -10,7 +10,6 @@ import Contact from "./pages/Contact";
 import ChatInterface from "./pages/ChatInterface";
 
 import Header from "./components/Header";
-import ChatbotTest from "./pages/ChatbotTest";
 
 function AppRoutes() {
     const location = useLocation();
@@ -39,7 +38,6 @@ function AppRoutes() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/chat" element={<ChatInterface />} />
-                <Route path="/chat-test" element={<ChatbotTest />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

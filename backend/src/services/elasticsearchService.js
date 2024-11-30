@@ -1,38 +1,47 @@
-const { Client } = require('@elastic/elasticsearch');
+import elasticClient from '../config/elasticDb.js';
+import { generateEmbeddings } from './embeddingService.js';
+import DocumentLoader from './documentLoader.js';
 
-const config = {
-    node: process.env.ELASTIC_URL || "http://127.0.0.1:9200",
+export const indexDocuments = async (sources) => {
+    const loader = new DocumentLoader();
+
+    for (const source of sources) {
+        let documents;
+
+        if (source.startsWith('http://') || source.startsWith('https://')) {
+            documents = [await loader.loadFromWeb(source)];
+        } else {
+            documents = await loader.loadDocuments(source);
+        }
+
+        const texts = documents.map(doc => doc.pageContent);
+        const embeddings = await generateEmbeddings(texts);
+
+        for (let i = 0; i < documents.length; i++) {
+            const doc = documents[i];
+            await elasticClient.index({
+                index: 'book',
+                body: {
+                    text: doc.pageContent,
+                    embedding: embeddings[i],
+                    metadata: doc.metadata,
+                },
+            });
+        }
+    }
 };
 
-if (process.env.ELASTIC_USERNAME && process.env.ELASTIC_PASSWORD) {
-    config.auth = {
-        username: process.env.ELASTIC_USERNAME,
-        password: process.env.ELASTIC_PASSWORD,
-    };
-}
-
-const client = new Client(config);
-
-async function indexHotel(hotel) {
-  await client.index({
-    index: 'hotels',
-    body: hotel
-  });
-}
-
-async function searchHotels(query) {
-  const result = await client.search({
-    index: 'hotels',
-    body: {
-      query: {
-        multi_match: {
-          query: query,
-          fields: ['name', 'description', 'location']
+export const retrieveDocuments = async (query) => {
+    const { body } = await elasticClient.search({
+        index: 'book',
+        body: {
+            query: {
+                match: {
+                    text: query
+                }
+            }
         }
-      }
-    }
-  });
-  return result.body.hits.hits.map(hit => hit._source);
-}
+    });
 
-module.exports = { indexHotel, searchHotels };
+    return body.hits.hits.map(hit => hit._source);
+};

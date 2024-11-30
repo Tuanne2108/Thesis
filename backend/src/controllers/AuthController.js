@@ -1,30 +1,23 @@
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import User from '../models/User.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-
-const signUp = async (req, res) => {
+export const signUp = async (req, res) => {
     try {
         const { email, password, confirmedPassword } = req.body;
 
         const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         if (!emailRegEx.test(email)) {
-            return res
-                .status(400)
-                .json({ status: "error", message: "Invalid email format" });
+            return res.status(400).json({ status: "error", message: "Invalid email format" });
         }
         if (password !== confirmedPassword) {
-            return res
-                .status(400)
-                .json({ status: "error", message: "Passwords do not match" });
+            return res.status(400).json({ status: "error", message: "Passwords do not match" });
         }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res
-                .status(400)
-                .json({ status: "error", message: "Email already exists" });
+            return res.status(400).json({ status: "error", message: "Email already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,16 +40,14 @@ const signUp = async (req, res) => {
     }
 };
 
-const signIn = async (req, res) => {
+export const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res
-                .status(401)
-                .json({ message: "Invalid email or password" });
+            return res.status(401).json({ message: "Invalid email or password" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -98,9 +89,10 @@ const signIn = async (req, res) => {
     }
 };
 
-const googleSignIn = async (req, res) => {
+export const googleSignIn = async (req, res) => {
     try {
         const { username, email, photo } = req.body;
+
         let user = await User.findOne({ email });
 
         if (user) {
@@ -124,27 +116,34 @@ const googleSignIn = async (req, res) => {
                 Math.random().toString(36).slice(-8);
             const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
+            const formattedUsername = username
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9]/g, '')
+                .toLowerCase() +
+                Math.random().toString(36).slice(-4);
+
             const newUser = await User.create({
-                username:
-                    (username || "").split(" ").join("").toLowerCase() +
-                    Math.random().toString(36).slice(-4),
+                username: formattedUsername,
                 email,
                 password: hashedPassword,
                 avatar: photo,
+                role: 'user',
+                profile: {}
             });
 
             const token = jwt.sign(
                 { id: newUser._id },
                 process.env.JWT_SECRET,
-                {
-                    expiresIn: "1h",
-                }
+                { expiresIn: "1h" }
             );
+            
             res.cookie("access_token", token, {
                 httpOnly: true,
                 sameSite: "Strict",
             });
-            const { password, ...rest } = newUser._doc;
+            
+            const { password: pwd, ...rest } = newUser._doc;
             return res.status(201).json({
                 status: "success",
                 message: "User created and logged in successfully",
@@ -152,14 +151,16 @@ const googleSignIn = async (req, res) => {
             });
         }
     } catch (error) {
-        res.status(500).json({
+        console.error('Detailed error:', error);
+        return res.status(500).json({
             status: "error",
-            message: "An unexpected error occurred",
+            message: error.message || "An unexpected error occurred",
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };
 
-const signOut = async (req, res) => {
+export const signOut = async (req, res) => {
     try {
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
@@ -175,14 +176,12 @@ const signOut = async (req, res) => {
     }
 };
 
-const refreshToken = async (req, res) => {
+export const refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refresh_token;
 
         if (!refreshToken) {
-            return res
-                .status(401)
-                .json({ message: "Refresh token not provided" });
+            return res.status(401).json({ message: "Refresh token not provided" });
         }
 
         jwt.verify(
@@ -190,9 +189,7 @@ const refreshToken = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET,
             (err, user) => {
                 if (err) {
-                    return res
-                        .status(403)
-                        .json({ message: "Invalid refresh token" });
+                    return res.status(403).json({ message: "Invalid refresh token" });
                 }
 
                 const accessToken = jwt.sign(
@@ -216,4 +213,3 @@ const refreshToken = async (req, res) => {
         });
     }
 };
-module.exports = { signUp, signIn, googleSignIn, signOut, refreshToken };

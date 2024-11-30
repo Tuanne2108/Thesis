@@ -1,13 +1,16 @@
-const express = require("express");
+import express from 'express';
+import * as authController from '../controllers/AuthController.js';
+
+
 const router = express.Router();
-const authController = require("../controllers/AuthController");
 
-//Request
-router.post("/sign-up", authController.signUp);
-router.post("/sign-in", authController.signIn);
-router.post("/google", authController.googleSignIn);
-router.get("/sign-out", authController.signOut);
-//Refresh token
-router.get("/refresh-token", authController.refreshToken);
+// Request
+router.post('/sign-up', authController.signUp);
+router.post('/sign-in', authController.signIn);
+router.post('/google', authController.googleSignIn);
+router.get('/sign-out', authController.signOut);
 
-module.exports = router;
+// Refresh token
+router.get('/refresh-token', authController.refreshToken);
+
+export default router;
