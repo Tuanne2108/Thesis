@@ -1,20 +1,34 @@
-import { generateEmbeddingsResponse } from './embeddingService.js';
-import { geminiModel } from '../config/gemini-config.js';
-import { retrieveDocuments } from './elasticsearchService.js';
+import { ElasticVectorSearch } from "@langchain/community/vectorstores/elasticsearch";
+import elasticClient from "../config/elasticDb.js";
+import { embeddings } from "../config/gemini-config.js";
 
-const searchAndAnswer = async (userQuery) => {
-    const retrievedDocs = await retrieveDocuments(userQuery);
+class RetrieverService {
+    constructor() {
+        this.retriever = null;
+    }
 
-    const texts = retrievedDocs.map(doc => doc.text); 
-    const concatenatedText = texts.join(' ');
+    async initialize() {
+        if (!this.retriever) {
+            this.retriever = await ElasticVectorSearch.fromExistingIndex(
+                embeddings,
+                {
+                    client: elasticClient,
+                    indexName: "hotels",
+                    vectorField: "embedding",
+                    dims: 768,
+                    similarity: "cosine",
+                }
+            );
+        }
+        return this.retriever;
+    }
 
-    const answer = await geminiModel(concatenatedText, userQuery);
+    async getRelevantDocuments(query) {
+        if (!this.retriever) {
+            await this.initialize();
+        }
+        return this.retriever.asRetriever().getRelevantDocuments(query);
+    }
+}
 
-    return answer;
-};
-
-// Example usage
-const userQuery = "What is the story about?";
-searchAndAnswer(userQuery)
-    .then(answer => console.log("Answer:", answer))
-    .catch(error => console.error("Error:", error));
+export default new RetrieverService();

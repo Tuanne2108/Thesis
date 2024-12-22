@@ -1,46 +1,39 @@
-import geminiModel from '../config/gemini-config.js';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import User from '../models/User.js';
-import { createError } from '../utils/error.js';
-
-const systemPrompt = `You are an expert travel assistant with extensive knowledge of destinations, accommodations, and travel planning. 
-Your role is to:
-- Provide detailed travel recommendations
-- Help with itinerary planning
-- Offer insights about destinations
-- Suggest accommodations based on preferences
-- Share local customs and travel tips
-- Assist with budgeting and cost estimates
-
-Please be conversational, friendly, and provide specific, actionable advice.`;
-
-const prompt = ChatPromptTemplate.fromMessages([
-    ["system", systemPrompt],
-    ["human", "{input}"]
-]);
+import askQuestion from "../services/ask.js";
+import User from "../models/User.js";
+import { createError } from "../utils/error.js";
 
 export const handleChatRequest = async (req, res, next) => {
     const { query } = req.body;
     const userId = req.user?._id;
 
     try {
-        const chain = prompt.pipe(geminiModel);
+        let chatHistory = [];
+        if (userId) {
+            const user = await User.findById(userId);
+            if (user && user.chats) {
+                chatHistory = user.chats.map((chat) => ({
+                    role: chat.role,
+                    content: chat.content,
+                }));
+            }
+        }
 
-        const response = await chain.invoke({
-            input: query,
-            message: query,
-        });
+        const response = await askQuestion(query, chatHistory);
+
+        if (!response || !response.text) {
+            return next(createError(500, "Failed to get a response from the model"));
+        }
 
         const userMessage = {
-            role: 'user',
-            content: query
+            role: "user",
+            content: query,
         };
 
         const assistantMessage = {
-            role: 'assistant',
-            content: response.geminiModel.content
+            role: "assistant",
+            content: response.text,
         };
-        console.log('response: ' + JSON.stringify(response));
+
         if (userId) {
             await saveChatHistory(userId, userMessage, assistantMessage);
         }
@@ -48,54 +41,68 @@ export const handleChatRequest = async (req, res, next) => {
         res.status(200).json({
             success: true,
             response: response.text,
-            messages: [userMessage, assistantMessage]
+            messages: [userMessage, assistantMessage],
         });
-
     } catch (error) {
         console.error("Error in chat request:", error);
         next(createError(500, "Failed to process chat request"));
     }
 };
 
-export const getChatHistory = async (req, res, next) => {
-    if (!req.user) {
-        return next(createError(401, "User not authenticated"));
-    }
+// export const getChatHistory = async (req, res, next) => {
+//     if (!req.user) {
+//         return next(createError(401, "User not authenticated"));
+//     }
 
-    const userId = req.user._id;
-    console.log('userId', userId);
-    try {
-        const user = await User.findById(userId);
+//     const userId = req.user._id;
 
-        if (!user) {
-            return next(createError(404, "User not found"));
-        }
+//     try {
+//         const user = await User.findById(userId);
 
-        res.status(200).json({
-            success: true,
-            chats: user.chats,
-        });
+//         if (!user) {
+//             return next(createError(404, "User not found"));
+//         }
 
-    } catch (error) {
-        console.error("Error fetching chat history:", error);
-        next(createError(500, "Failed to fetch chat history"));
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             chats: user.chats,
+//         });
+//     } catch (error) {
+//         console.error("Error fetching chat history:", error);
+//         next(createError(500, "Failed to fetch chat history"));
+//     }
+// };
 
+// export const clearChatHistory = async (req, res, next) => {
+//     if (!req.user) {
+//         return next(createError(401, "User not authenticated"));
+//     }
 
-export const clearChatHistory = async (req, res, next) => {
-    try {
-        const userId = req.user._id;
-        await User.findByIdAndUpdate(userId, { $set: { chats: [] } });
+//     try {
+//         const userId = req.user._id;
+//         await User.findByIdAndUpdate(userId, { $set: { chats: [] } });
 
-        res.status(200).json({
-            success: true,
-            message: "Chat history cleared successfully"
-        });
+//         res.status(200).json({
+//             success: true,
+//             message: "Chat history cleared successfully",
+//         });
+//     } catch (error) {
+//         console.error("Error clearing chat history:", error);
+//         next(createError(500, "Failed to clear chat history"));
+//     }
+// };
 
-    } catch (error) {
-        console.error("Error clearing chat history:", error);
-        next(createError(500, "Failed to clear chat history"));
-    }
-};
-export const saveChatHistory = async (chatHistory) => {};
+// export const saveChatHistory = async (userId, userMessage, assistantMessage) => {
+//     try {
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             throw new Error("User not found");
+//         }
+
+//         // Append new chat messages to the user's chat history
+//         const newChats = [...(user.chats || []), userMessage, assistantMessage];
+//         await User.findByIdAndUpdate(userId, { chats: newChats });
+//     } catch (error) {
+//         console.error("Error saving chat history:", error);
+//     }
+// };

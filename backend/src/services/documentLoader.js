@@ -1,4 +1,3 @@
-// src/loaders/documentLoader.js
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
@@ -8,11 +7,11 @@ import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/
 
 class DocumentLoader {
     async loadCSV(filePath) {
+        const results = [];
         return new Promise((resolve, reject) => {
-            const results = [];
             fs.createReadStream(filePath)
                 .pipe(csv())
-                .on('data', (data) => results.push(data))
+                .on('data', (data) => results.push({ text: JSON.stringify(data) }))
                 .on('end', () => resolve(results))
                 .on('error', (error) => reject(error));
         });
@@ -21,28 +20,32 @@ class DocumentLoader {
     async loadPDF(filePath) {
         const loader = new PDFLoader(filePath);
         const docs = await loader.load();
-        return docs;
+        return docs.map(doc => ({
+            text: doc.pageContent,
+            metadata: doc.metadata || {},
+        }));
     }
 
     async loadWeb(url) {
         const response = await axios.get(url);
-        const loader = new CheerioWebBaseLoader(
-            response,
-            {
-            }
-          );
-        const $ = loader.load(response.data);
-        const text = $('body').text();
-        return { text };
+        const loader = new CheerioWebBaseLoader(url);
+        const docs = await loader.load();
+        return docs.map(doc => ({
+            text: doc.text,
+            metadata: { url },
+        }));
     }
 
     async loadText(filePath) {
         const fileContent = fs.readFileSync(filePath, 'utf-8');
-        return { text: fileContent };
+        return [{ text: fileContent, metadata: { filePath } }];
     }
 
     async loadDocuments(source) {
-        const ext = path.extname(source);
+        const ext = path.extname(source).toLowerCase();
+        if (!fs.existsSync(source)) {
+            throw new Error(`File not found: ${source}`);
+        }
         switch (ext) {
             case '.csv':
                 return await this.loadCSV(source);

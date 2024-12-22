@@ -1,4 +1,3 @@
-// src/services/embeddingService.js
 import { embeddings } from '../config/gemini-config.js';
 
 export const generateEmbeddings = async (texts) => {
@@ -6,8 +5,4 @@ export const generateEmbeddings = async (texts) => {
         throw new Error("Expected an array of texts");
     }
     return await embeddings.embedDocuments(texts);
-};
-
-export const generateEmbeddingsResponse = async (texts) => {
-    return await embeddings.embedQuery(texts);
 };
