@@ -6,15 +6,22 @@ import { parse } from "csv-parse/sync";
 
 class BookingCrawler {
     constructor(options = {}) {
-        this.browser = null;
-        this.page = null;
-        this.dataDir = options.dataDir || "data";
+        this.baseDir = options.baseDir || "data";
+        this.hotelDir = path.join(this.baseDir, "hotels");
+        this.attractionDir = path.join(this.baseDir, "attractions");
         this.userAgents = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0",
         ];
         this.startTime = null;
+    }
+
+    async createBrowser() {
+        const browser = await puppeteer.launch(this.getBrowserConfig());
+        const page = await browser.newPage();
+        await this.setupPage(page);
+        return { browser, page };
     }
 
     logProgress(message, includeTimestamp = true) {
@@ -33,7 +40,6 @@ class BookingCrawler {
             );
         }
     }
-    
 
     async initialize() {
         this.startTime = Date.now();
@@ -90,10 +96,10 @@ class BookingCrawler {
         );
     }
 
-    async navigateWithRetry(url, maxRetries = 3) {
+    async navigateWithRetry(page, url, maxRetries = 3) {
         for (let i = 0; i < maxRetries; i++) {
             try {
-                await this.page.goto(url, {
+                await page.goto(url, {
                     waitUntil: "domcontentloaded",
                     timeout: 30000,
                 });
@@ -124,20 +130,20 @@ class BookingCrawler {
         }
     }
 
-    async findWorkingSelector(selectors) {
+    async findWorkingSelector(page, selectors) {
         for (const selector of selectors) {
             try {
-                await this.page.waitForSelector(selector, { timeout: 5000 });
+                await page.waitForSelector(selector, { timeout: 5000 });
                 return selector;
             } catch (error) {
                 console.log(`Selector ${selector} not found, trying next...`);
             }
         }
-        throw new Error("No valid hotel cards selector found");
+        throw new Error("No valid selector found");
     }
 
-    async extractHotelData(selector) {
-        return this.page.evaluate((sel) => {
+    async extractHotelData(page, selector) {
+        return page.evaluate((sel) => {
             const getTextContent = (element, selector) =>
                 element.querySelector(selector)?.textContent?.trim() || "";
 
@@ -167,8 +173,8 @@ class BookingCrawler {
         }, selector);
     }
 
-    async extractHotelDetails() {
-        return this.page.evaluate(() => {
+    async extractHotelDetails(page) {
+        return page.evaluate(() => {
             const getTextContent = (selector) =>
                 document.querySelector(selector)?.textContent?.trim() || "";
 
@@ -234,53 +240,338 @@ class BookingCrawler {
         });
     }
 
-    async crawlHotels(city, checkIn, checkOut) {
-        this.logProgress(
-            `Starting crawl for ${city} (${checkIn} to ${checkOut})`
-        );
+    async extractAttractionData(page, selector) {
+        return page.evaluate((sel) => {
+            const getTextContent = (element, selector) =>
+                element.querySelector(selector)?.textContent?.trim() || "";
+
+            return Array.from(document.querySelectorAll(sel))
+                .map((card) => {
+                    const url =
+                        card.querySelector('h3[data-testid="card-title"] a')
+                            ?.href || "";
+
+                    const reviewScoreDiv = card.querySelector(
+                        'div[data-testid="review-score"]'
+                    );
+
+                    const rating =
+                        reviewScoreDiv
+                            ?.querySelector(".css-35ezg3")
+                            ?.textContent?.trim() || "";
+
+                    const reviewText =
+                        reviewScoreDiv
+                            ?.querySelector(".a53cbfa6de:last-child")
+                            ?.textContent?.trim() || "";
+                    const numberOfReviews =
+                        reviewText.match(/\((\d+)\s+reviews\)/)?.[1] || "";
+
+                    return {
+                        name: getTextContent(
+                            card,
+                            '[data-testid="card-title"]'
+                        ),
+                        rating: rating,
+                        numberOfReviews: numberOfReviews,
+                        url,
+                    };
+                })
+                .filter((attraction) => attraction.name && attraction.url);
+        }, selector);
+    }
+
+    async extractAttractionDetails(page) {
+        return page.evaluate(() => {
+            const images = Array.from(
+                document.querySelectorAll('[data-testid^="gridImage-"] img')
+            )
+                .map((img) => ({
+                    url: img.src,
+                    alt: img.alt,
+                }))
+                .filter((img) => img.url);
+
+            const description = Array.from(
+                document.querySelectorAll(
+                    'div[data-testid="attr-content"] .css-n9kgwt .bcdcb105b3'
+                )
+            )
+                .map((p) => p.textContent.trim())
+                .filter((text) => text.length > 0)
+                .join("\n");
+
+            const included = Array.from(
+                document.querySelectorAll(".f660aace8b.a466af8d48")
+            )
+                .map((item) => item.textContent.trim())
+                .filter(Boolean);
+
+            const cancellationContainer = document.querySelector(
+                ".a3b8729ab1.d068504c75"
+            );
+            const cancellationDetails = document.querySelector(
+                ".a53cbfa6de.f45d8e4c32"
+            );
+            const cancellationPolicy =
+                cancellationContainer && cancellationDetails
+                    ? `${cancellationContainer.textContent.trim()} - ${cancellationDetails.textContent.trim()}`
+                    : "";
+
+            const additionalInfo = Array.from(
+                document.querySelectorAll("h3.f6431b446c.css-zwx81y")
+            )
+                .filter((header) =>
+                    header.textContent.includes("Additional information")
+                )
+                .flatMap((header) => {
+                    const infoDiv = header.nextElementSibling;
+                    return infoDiv
+                        ? Array.from(infoDiv.querySelectorAll(".bcdcb105b3"))
+                              .map((p) => p.textContent.trim())
+                              .filter(Boolean)
+                        : [];
+                })
+                .join("\n");
+
+            const whatToKnow = Array.from(
+                document.querySelectorAll("h3.f6431b446c.css-zwx81y")
+            )
+                .filter((header) =>
+                    header.textContent.includes("What you need to know")
+                )
+                .flatMap((header) => {
+                    const infoDiv = header.nextElementSibling;
+                    return infoDiv
+                        ? Array.from(infoDiv.querySelectorAll(".bcdcb105b3"))
+                              .map((p) => p.textContent.trim())
+                              .filter(Boolean)
+                        : [];
+                })
+                .join("\n");
+
+            const location =
+                document
+                    .querySelector(".f660aace8b.f81ab4937d div:last-child")
+                    ?.textContent.trim() || "";
+
+            const tickets = Array.from(
+                document.querySelectorAll(
+                    '[data-testid="ticket-selector-stepper"]'
+                )
+            ).map((ticketElement) => {
+                const label = ticketElement
+                    .querySelector(".a984a491d9")
+                    ?.textContent.trim();
+                const currentPrice = ticketElement
+                    .querySelector(".b76b1e28fc")
+                    ?.textContent.trim();
+                const originalPrice = ticketElement
+                    .querySelector(".f2ce4336b0")
+                    ?.textContent.trim();
+
+                return {
+                    type: label || "",
+                    currentPrice: currentPrice || "",
+                    originalPrice: originalPrice || "",
+                };
+            });
+
+            return {
+                description,
+                included,
+                cancellationPolicy,
+                additionalInfo,
+                whatToKnow,
+                location,
+                images,
+                tickets,
+            };
+        });
+    }
+
+    async crawlParallel(location, checkIn, checkOut) {
+        this.startTime = Date.now();
+        await this.ensureDataDirectory();
+        const [city, countryCode, country] = location.split("-");
+
+        // const { browser: hotelBrowser, page: hotelPage } =
+        //     await this.createBrowser();
+        const { browser: attractionBrowser, page: attractionPage } =
+            await this.createBrowser();
+
+        try {
+            this.logProgress(
+                "Starting parallel crawl for hotels and attractions"
+            );
+
+            const [attractions] = await Promise.all([
+                // this.crawlHotelsWithPage(
+                //     hotelPage,
+                //     `${city}-${country}`,
+                //     checkIn,
+                //     checkOut
+                // ),
+                this.crawlAttractionsWithPage(
+                    attractionPage,
+                    `${city}-${countryCode}`
+                ),
+            ]);
+
+            await Promise.all([
+                // this.saveToCSV(hotels, `${city}_hotels.csv`, "hotel"),
+                this.saveToCSV(attractions, `${city}_attractions.csv`, "attraction"),
+            ]);
+
+            this.logProgress("Completed parallel crawl");
+            this.logTimeElapsed();
+
+            return { attractions };
+        } finally {
+            // await hotelBrowser.close();
+            await attractionBrowser.close();
+        }
+    }
+
+    async crawlHotelsWithPage(page, location, checkIn, checkOut) {
+        this.logProgress(`Starting hotel crawl for ${location}`);
         const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
-            city
+            location
         )}&checkin=${checkIn}&checkout=${checkOut}&lang=en-us&selected_currency=USD`;
 
-        await this.navigateWithRetry(url);
+        await this.navigateWithRetry(page, url);
         await this.delay(2000);
-        await this.handleCookieConsent();
+        await this.handleCookieConsent(page);
+        await this.loadAllResults(page);
 
-        const selector = await this.findWorkingSelector([
+        const selector = await this.findWorkingSelector(page, [
             'div[data-testid="property-card"]',
-            "div.a826ba81c4",
-            "div.b978843432",
-            'div[data-testid="accommodation-list-element"]',
-            "div.property-card",
         ]);
 
-        await this.autoScroll();
-        const hotels = await this.extractHotelData(selector);
-        this.logProgress(`Found ${hotels.length} hotels in total`);
+        await this.autoScroll(page);
+        const hotels = await this.extractHotelData(page, selector);
 
         const detailedHotels = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < hotels.length; i++) {
             const hotel = hotels[i];
             this.logProgress(
                 `Processing hotel ${i + 1}/${hotels.length}: ${hotel.name}`
             );
-            this.logProgress(
-                `Progress: ${(((i + 1) / hotels.length) * 100).toFixed(1)}%`
-            );
-
-            await this.navigateWithRetry(hotel.url);
+            await this.navigateWithRetry(page, hotel.url);
             await this.delay(2000);
-            const details = await this.extractHotelDetails();
+            const details = await this.extractHotelDetails(page);
             detailedHotels.push({ ...hotel, ...details });
         }
 
-        this.logProgress(`Completed crawling ${detailedHotels.length} hotels`);
-        this.logTimeElapsed();
         return detailedHotels;
     }
 
-    async autoScroll() {
-        await this.page.evaluate(() => {
+    async crawlAttractionsWithPage(page, location) {
+        const [city, countryCode, country] = location.split("-");
+        const formattedCity = city.replace(/-/g, "").toLowerCase();
+        this.logProgress(`Starting attraction crawl for ${city}`);
+        const baseUrl = `https://www.booking.com/attractions/searchresults/${countryCode}/${formattedCity}.html`;
+
+        await this.navigateWithRetry(page, url);
+        await this.delay(2000);
+        await this.handleCookieConsent(page);
+        await this.loadAllResults(page);
+
+        const selector = await this.findWorkingSelector(page, [
+            'div[data-testid="card"]',
+        ]);
+
+        await this.autoScroll(page);
+        const attractions = await this.extractAttractionData(page, selector);
+
+        const detailedAttractions = [];
+        for (let i = 0; i < attractions.length; i++) {
+            const attraction = attractions[i];
+            this.logProgress(
+                `Processing attraction ${i + 1}/${attractions.length}: ${
+                    attraction.name
+                }`
+            );
+            await this.navigateWithRetry(page, attraction.url);
+            await this.delay(2000);
+            const details = await this.extractAttractionDetails(page);
+            detailedAttractions.push({ ...attraction, ...details });
+        }
+
+        return detailedAttractions;
+    }
+
+    async loadAllResults(page) {
+        this.logProgress("Starting to load all results...");
+        let previousHeight = 0;
+        let loadMoreAttempts = 0;
+        const maxAttempts = 50;
+    
+        while (loadMoreAttempts < maxAttempts) {
+            try {
+                await this.autoScroll(page);
+                await this.delay(1000);
+    
+                const loadMoreButton = await page.waitForSelector(
+                    "button.a83ed08757.c21c56c305.bf0537ecb5.f671049264",
+                    { timeout: 4000 }
+                );
+    
+                if (!loadMoreButton) {
+                    const alternativeButton = await page.$(
+                        "button.a83ed08757.c21c56c305.bf0537ecb5.f671049264"
+                    );
+    
+                    if (!alternativeButton) {
+                        this.logProgress("No more results to load");
+                        break;
+                    }
+                }
+    
+                await page.evaluate(() => {
+                    const button = document.querySelector(
+                        "button.a83ed08757.c21c56c305.bf0537ecb5.f671049264"
+                    );
+                    if (button) {
+                        button.click();
+                    }
+                });
+    
+                await this.delay(2000);
+    
+                const currentHeight = await page.evaluate(
+                    () => document.body.scrollHeight
+                );
+    
+                if (currentHeight === previousHeight) {
+                    loadMoreAttempts++;
+                    if (loadMoreAttempts >= 3) {
+                        this.logProgress(
+                            "No new content loaded after 3 attempts, stopping"
+                        );
+                        break;
+                    }
+                } else {
+                    loadMoreAttempts = 0;
+                    previousHeight = currentHeight;
+                }
+            } catch (error) {
+                console.log("Error while loading more results:", error.message);
+                loadMoreAttempts++;
+                if (loadMoreAttempts >= 3) {
+                    this.logProgress(
+                        "Failed to load more results after 3 attempts, stopping"
+                    );
+                    break;
+                }
+                await this.delay(2000);
+            }
+        }
+        this.logProgress("Finished loading all results");
+    }
+
+    async autoScroll(page) {
+        await page.evaluate(() => {
             return new Promise((resolve) => {
                 const distance = 100;
                 const timer = setInterval(() => {
@@ -298,16 +589,18 @@ class BookingCrawler {
     }
 
     async ensureDataDirectory() {
-        try {
-            await fs.access(this.dataDir);
-        } catch {
-            await fs.mkdir(this.dataDir, { recursive: true });
-        }
+        await fs.mkdir(this.hotelDir, { recursive: true });
+        await fs.mkdir(this.attractionDir, { recursive: true });
+        await fs.mkdir(path.join(this.hotelDir, "images"), { recursive: true });
+        await fs.mkdir(path.join(this.attractionDir, "images"), {
+            recursive: true,
+        });
     }
 
-    async readExistingCSV(filename) {
+    async readExistingCSV(filename, type) {
         try {
-            const filePath = path.join(this.dataDir, filename);
+            const dir = type === "hotel" ? this.hotelDir : this.attractionDir;
+            const filePath = path.join(dir, filename);
             const content = await fs.readFile(filePath, "utf-8");
             return parse(content, {
                 columns: true,
@@ -315,7 +608,7 @@ class BookingCrawler {
             });
         } catch (error) {
             console.log(
-                "No existing file found or error reading file:",
+                `No existing ${type} file found or error reading file:`,
                 error.message
             );
             return [];
@@ -348,87 +641,183 @@ class BookingCrawler {
         return merged;
     }
 
-    async saveToCSV(data, filename) {
+    async saveToCSV(data, filename, type) {
         try {
-            this.logProgress("Preparing to save data...");
-            await this.ensureDataDirectory();
-            const filePath = path.join(this.dataDir, filename);
+            this.logProgress(`Preparing to save ${type} data...`);
+            const dir = type === "hotel" ? this.hotelDir : this.attractionDir;
+            const filePath = path.join(dir, filename);
 
-            this.logProgress("Reading existing data (if any)...");
-            const existingData = await this.readExistingCSV(filename);
+            this.logProgress(`Reading existing ${type} data (if any)...`);
+            const existingData = await this.readExistingCSV(filename, type);
 
-            this.logProgress("Merging new data with existing data...");
+            this.logProgress(`Merging new ${type} data with existing data...`);
             const mergedData = await this.mergeAndUpdateData(
                 data,
                 existingData
             );
 
-            const newRecords = data.length;
-            const updatedRecords = mergedData.length - existingData.length;
-            const totalRecords = mergedData.length;
-
-            const flattenedData = mergedData.map((hotel) => ({
-                Name: hotel.name,
-                Price: hotel.price,
-                Rating: hotel.rating,
-                Address: hotel.address,
-                "No. review": hotel.numberOfReviews,
-                "Popular Facilities": hotel.popularFacilities,
-                "All Facilities": hotel.allFacilities
-                    ?.map(
-                        (group) =>
-                            `${group.groupTitle}: ${group.items.join(", ")}`
-                    )
-                    .join("\n"),
-                "Room Details": hotel.roomDetailsList?.join("\n"),
-                "Hotel Rules": hotel.houseRules,
-                Description: hotel.description,
-                URL: hotel.url,
-                FirstAdded: hotel.FirstAdded,
-                LastUpdated: hotel.LastUpdated,
-            }));
-
-            const filteredData = flattenedData.filter(
-                (item) => item.Name && typeof item.Name === "string"
-            );
-            filteredData.sort((a, b) => a.Name.localeCompare(b.Name));
+            const flattenedData =
+                type === "hotel"
+                    ? this.flattenHotelData(mergedData)
+                    : this.flattenAttractionData(mergedData);
 
             await fs.writeFile(
                 filePath,
                 stringify(flattenedData, {
                     header: true,
-                    columns: Object.keys(filteredData[0]),
+                    columns: Object.keys(flattenedData[0]),
                 })
             );
 
-            console.log(`Total records in file: ${totalRecords}`);
-            console.log(`New records added: ${newRecords}`);
-            console.log(`Records updated: ${updatedRecords}`);
-            console.log(`File saved to: ${filePath}`);
-            this.logTimeElapsed();
+            const imagesDir = path.join(dir, "images");
+            if (type === "attraction") {
+                await this.saveAttractionImages(data, imagesDir);
+            }
+
+            console.log(`${type} data saved to: ${filePath}`);
+            console.log(`Total ${type} records: ${mergedData.length}`);
         } catch (error) {
-            console.error("Error saving to CSV:", error);
+            console.error(`Error saving ${type} data:`, error);
             throw error;
         }
     }
 
-    async createBackup(filename) {
+    async createBackup(filename, type) {
         try {
-            const filePath = path.join(this.dataDir, filename);
+            const dir = type === "hotel" ? this.hotelDir : this.attractionDir;
+            const filePath = path.join(dir, filename);
             const backupPath = path.join(
-                this.dataDir,
+                dir,
                 `backup_${filename}_${Date.now()}.csv`
             );
 
             try {
                 await fs.access(filePath);
                 await fs.copyFile(filePath, backupPath);
-                console.log(`Backup created: ${backupPath}`);
+                console.log(`${type} backup created: ${backupPath}`);
             } catch (error) {
-                console.log("No existing file to backup");
+                console.log(`No existing ${type} file to backup`);
             }
         } catch (error) {
-            console.error("Error creating backup:", error);
+            console.error(`Error creating ${type} backup:`, error);
+        }
+    }
+
+    flattenHotelData(hotels) {
+        return hotels.map((hotel) => ({
+            Name: hotel.name,
+            Price: hotel.price,
+            Rating: hotel.rating,
+            Address: hotel.address,
+            "No. review": hotel.numberOfReviews,
+            "Popular Facilities": hotel.popularFacilities,
+            "All Facilities": hotel.allFacilities
+                ?.map(
+                    (group) => `${group.groupTitle}: ${group.items.join(", ")}`
+                )
+                .join("\n"),
+            "Room Details": hotel.roomDetailsList?.join("\n"),
+            "Hotel Rules": hotel.houseRules,
+            Description: hotel.description,
+            URL: hotel.url,
+            FirstAdded: hotel.FirstAdded,
+            LastUpdated: hotel.LastUpdated,
+        }));
+    }
+
+    flattenAttractionData(attractions) {
+        return attractions.map((attraction) => ({
+            Name: attraction.name,
+            Rating: attraction.rating,
+            "No. Reviews": attraction.numberOfReviews,
+            Description: attraction.description,
+            "What's Included": attraction.included?.join("\n"),
+            "Cancellation Policy": attraction.cancellationPolicy,
+            "Additional Info": attraction.additionalInfo,
+            "What to Know": attraction.whatToKnow,
+            Location: attraction.location,
+            Ticket: this.formatTickets(attraction.tickets),
+            Images: attraction.images?.map((img) => img.url).join(", "),
+            URL: attraction.url,
+            FirstAdded: attraction.FirstAdded,
+            LastUpdated: attraction.LastUpdated,
+        }));
+    }
+
+    formatTickets(tickets) {
+        if (!tickets || !Array.isArray(tickets)) return "";
+        return tickets
+            .map((ticket) => {
+                const parts = [];
+                parts.push(`Type: ${ticket.type}`);
+                if (ticket.currentPrice)
+                    parts.push(`Price: ${ticket.currentPrice}`);
+                if (ticket.originalPrice)
+                    parts.push(`Original: ${ticket.originalPrice}`);
+                return parts.join(" | ");
+            })
+            .join("\n");
+    }
+
+    async saveAttractionImages(attractions, imagesDir) {
+        for (const attraction of attractions) {
+            if (attraction.images && attraction.images.length > 0) {
+                const attractionFolderName = attraction.name
+                    .replace(/[^a-z0-9]/gi, "_")
+                    .toLowerCase()
+                    .replace(/_+/g, "_")
+                    .replace(/^_|_$/g, "");
+
+                const attractionDir = path.join(
+                    imagesDir,
+                    attractionFolderName
+                );
+                await fs.mkdir(attractionDir, { recursive: true });
+
+                for (let i = 0; i < attraction.images.length; i++) {
+                    const imgUrl = attraction.images[i].url;
+                    const imgPath = path.join(
+                        attractionDir,
+                        `image_${i + 1}.jpg`
+                    );
+
+                    try {
+                        const response = await fetch(imgUrl);
+                        if (!response.ok)
+                            throw new Error(
+                                `HTTP error! status: ${response.status}`
+                            );
+
+                        const fileStream = await fs.open(imgPath, "w");
+                        const writer = fileStream.createWriteStream();
+
+                        const arrayBuffer = await response.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+                        writer.write(buffer);
+                        writer.end();
+
+                        await new Promise((resolve, reject) => {
+                            writer.on("finish", resolve);
+                            writer.on("error", reject);
+                        });
+
+                        await fileStream.close();
+
+                        this.logProgress(
+                            `Saved image ${i + 1}/${
+                                attraction.images.length
+                            } for ${attraction.name}`
+                        );
+                    } catch (error) {
+                        console.error(
+                            `Error downloading image ${i + 1} for ${
+                                attraction.name
+                            }:`,
+                            error.message
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -439,30 +828,32 @@ class BookingCrawler {
     }
 }
 
-const runCrawler = async () => {
+const runParallelCrawler = async () => {
     const crawler = new BookingCrawler({
-        dataDir: "data",
+        baseDir: "../data",
     });
 
+    await crawler.initialize();
+
     try {
-        await crawler.initialize();
+        const location = "nha-trang-vn-vietnam";
+        const checkIn = "2024-12-22";
+        const checkOut = "2024-12-23";
 
-        await crawler.createBackup("dalat_hotels.csv");
-
-        const hotels = await crawler.crawlHotels(
-            "dalat-vietnam",
-            "2024-12-22",
-            "2024-12-23"
+        const results = await crawler.crawlParallel(
+            location,
+            checkIn,
+            checkOut
         );
-
-        await crawler.saveToCSV(hotels, "dalat_hotels.csv");
+        console.log(
+            `Crawled ${results.hotels.length} hotels and ${results.attractions.length} attractions`
+        );
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error during parallel crawl:", error);
     } finally {
         await crawler.close();
-        console.log(`\nEnd time: ${new Date().toLocaleString()}`);
     }
 };
 
-runCrawler();
+runParallelCrawler();
 export default BookingCrawler;
