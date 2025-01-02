@@ -211,8 +211,11 @@ class BookingCrawler {
                     })
                     .filter(Boolean);
             const rulesSections = document.querySelectorAll("div.a26e4f0adb");
+            const addressElement = document.querySelector("div.a53cbfa6de.f17adf7576");
+            const address = addressElement ? 
+                addressElement.childNodes[0].textContent.trim() : "";
             return {
-                address: getTextContent("div.a53cbfa6de.f17adf7576"),
+                address: address,
                 description: getTextContent(
                     '[data-testid="property-description"]'
                 ),
@@ -282,7 +285,69 @@ class BookingCrawler {
     }
 
     async extractAttractionDetails(page) {
+        await page.evaluate(async () => {
+            const showMoreButtons = document.querySelectorAll('button.a83ed08757.f88a5204c2.b98133fb50');
+            for (const button of showMoreButtons) {
+                if (button.textContent.includes('Show')) {
+                    await button.click();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+        });
+
+        await this.delay(2000);
         return page.evaluate(() => {
+            // const extractItinerary = () => {
+            //     const selectors = [
+            //         '.css-cx2ej0',
+            //         '.css-dba25'
+            //     ];
+
+            //     let allStops = null;
+
+            //     for (const selector of selectors) {
+            //         const elements = document.querySelectorAll(selector);
+            //         if (elements && elements.length > 0) {
+            //             allStops = elements;
+            //             break;
+            //         }
+            //     }
+
+            //     if (!allStops || allStops.length === 0) {
+            //         return [];
+            //     }
+    
+            //     const itineraryItems = [];
+
+            //     allStops.forEach(stop => {
+            //         const nameContainer = stop.querySelector('.css-yzcb9u div:first-child');
+            //         const stopName = nameContainer.querySelector('span.e1eebb6a1e')?.textContent?.trim();
+    
+            //         const durationElement = stop.querySelector('.css-uirwny .a53cbfa6de');
+            //         const duration = durationElement.textContent.trim();
+    
+            //         const descriptionElement = stop.querySelector('div.bcdcb105b3.fd0c3f4521');
+            //         const description = descriptionElement.textContent.trim();
+                    
+            //         itineraryItems.push({
+            //             name: stopName,
+            //             duration,
+            //             description,
+            //         });
+            //     });
+            //     return itineraryItems;
+            // };
+
+            const extractDeparturePoint = () => {
+                const departureContainer = document.querySelector('.f660aace8b.f81ab4937d');
+                if (!departureContainer) return null;
+            
+                const addressDiv = departureContainer.querySelectorAll('.f660aace8b')[1];
+                return addressDiv?.textContent?.trim() || "";
+            };
+
+            const duration = document.querySelector('.css-skmqk5 .e1eebb6a1e')?.textContent?.trim() || "";
+
             const images = Array.from(
                 document.querySelectorAll('[data-testid^="gridImage-"] img')
             )
@@ -301,10 +366,12 @@ class BookingCrawler {
                 .filter((text) => text.length > 0)
                 .join("\n");
 
-            const included = Array.from(
-                document.querySelectorAll(".f660aace8b.a466af8d48")
-            )
-                .map((item) => item.textContent.trim())
+                const included = Array.from(document.querySelectorAll('.bcdcb105b3.f660aace8b h2'))
+                .filter(h2 => h2.textContent.includes("What's included"))
+                .flatMap(h2 => {
+                    const ul = h2.nextElementSibling;
+                    return ul ? Array.from(ul.querySelectorAll('li .a466af8d48')).map(item => item.textContent.trim()) : [];
+                })
                 .filter(Boolean);
 
             const cancellationContainer = document.querySelector(
@@ -386,6 +453,9 @@ class BookingCrawler {
                 location,
                 images,
                 tickets,
+                duration,
+            // itinerary: extractItinerary(),
+            departurePoint: extractDeparturePoint()
             };
         });
     }
@@ -395,8 +465,8 @@ class BookingCrawler {
         await this.ensureDataDirectory();
         const [city, countryCode, country] = location.split("-");
 
-        // const { browser: hotelBrowser, page: hotelPage } =
-        //     await this.createBrowser();
+        const { browser: hotelBrowser, page: hotelPage } =
+            await this.createBrowser();
         const { browser: attractionBrowser, page: attractionPage } =
             await this.createBrowser();
 
@@ -405,13 +475,13 @@ class BookingCrawler {
                 "Starting parallel crawl for hotels and attractions"
             );
 
-            const [attractions] = await Promise.all([
-                // this.crawlHotelsWithPage(
-                //     hotelPage,
-                //     `${city}-${country}`,
-                //     checkIn,
-                //     checkOut
-                // ),
+            const [hotels, attractions] = await Promise.all([
+                this.crawlHotelsWithPage(
+                    hotelPage,
+                    `${city}-${country}`,
+                    checkIn,
+                    checkOut
+                ),
                 this.crawlAttractionsWithPage(
                     attractionPage,
                     `${city}-${countryCode}`
@@ -419,25 +489,23 @@ class BookingCrawler {
             ]);
 
             await Promise.all([
-                // this.saveToCSV(hotels, `${city}_hotels.csv`, "hotel"),
+                this.saveToCSV(hotels, `${city}_hotels.csv`, "hotel"),
                 this.saveToCSV(attractions, `${city}_attractions.csv`, "attraction"),
             ]);
 
             this.logProgress("Completed parallel crawl");
             this.logTimeElapsed();
 
-            return { attractions };
+            return { hotels, attractions };
         } finally {
-            // await hotelBrowser.close();
+            await hotelBrowser.close();
             await attractionBrowser.close();
         }
     }
 
     async crawlHotelsWithPage(page, location, checkIn, checkOut) {
         this.logProgress(`Starting hotel crawl for ${location}`);
-        const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
-            location
-        )}&checkin=${checkIn}&checkout=${checkOut}&lang=en-us&selected_currency=USD`;
+        const url = "https://www.booking.com/searchresults.en-gb.html?ss=Da+Lat%2C+Vietnam&ssne=Nha+Trang&ssne_untouched=Nha+Trang&efdco=1&label=gen173nr-1FCAEoggI46AdIM1gEaPQBiAEBmAEJuAEZyAEM2AEB6AEB-AEMiAIBqAIDuALiiZ-7BsACAdICJDRlMGRhNWQ3LTY5MDctNDkxNi1iOTI5LWIzNWM4YWYxZDY3Y9gCBuACAQ&sid=a00d49f16300ccfe35bc183f5c991edb&aid=304142&lang=en-gb&sb=1&src_elem=sb&src=index&dest_id=-3712045&dest_type=city&checkin=2025-01-02&checkout=2025-01-03&group_adults=2&no_rooms=1&group_children=0";
 
         await this.navigateWithRetry(page, url);
         await this.delay(2000);
@@ -470,7 +538,7 @@ class BookingCrawler {
         const [city, countryCode, country] = location.split("-");
         const formattedCity = city.replace(/-/g, "").toLowerCase();
         this.logProgress(`Starting attraction crawl for ${city}`);
-        const baseUrl = `https://www.booking.com/attractions/searchresults/${countryCode}/${formattedCity}.html`;
+        const url = `https://www.booking.com/attractions/searchresults/${countryCode}/${formattedCity}.html`;
 
         await this.navigateWithRetry(page, url);
         await this.delay(2000);
@@ -736,6 +804,12 @@ class BookingCrawler {
             "Additional Info": attraction.additionalInfo,
             "What to Know": attraction.whatToKnow,
             Location: attraction.location,
+            Duration: attraction.duration,
+            // "Itinerary": attraction.itinerary ? 
+            // attraction.itinerary.map(stop => 
+            //     `Stop: ${stop.name}\nDuration: ${stop.duration}\nDescription: ${stop.description}}`
+            // ).join("\n\n") : "",
+            "Departure Point": attraction.departurePoint,
             Ticket: this.formatTickets(attraction.tickets),
             Images: attraction.images?.map((img) => img.url).join(", "),
             URL: attraction.url,
@@ -836,9 +910,9 @@ const runParallelCrawler = async () => {
     await crawler.initialize();
 
     try {
-        const location = "nha-trang-vn-vietnam";
-        const checkIn = "2024-12-22";
-        const checkOut = "2024-12-23";
+        const location = "dalat-vn-vietnam";
+        const checkIn = "2024-01-02";
+        const checkOut = "2024-01-03";
 
         const results = await crawler.crawlParallel(
             location,
