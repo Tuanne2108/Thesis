@@ -17,4 +17,4 @@ Dockerfile
 
 # Environment variables
 .env
-
+data/
