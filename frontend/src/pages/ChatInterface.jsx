@@ -16,6 +16,7 @@ import heroImage from "../assets/hero_image.jpeg";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import * as ChatApi from "../api/ChatApi";
+import { tryParseJSON, renderMessageContent } from "./MessageTemplating";
 
 const ChatInterface = () => {
     const navigate = useNavigate();
@@ -25,7 +26,10 @@ const ChatInterface = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [messages, setMessages] = useState([
-        { role: "bot", text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?" },
+        {
+            role: "bot",
+            text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?",
+        },
     ]);
     const [inputText, setInputText] = useState("");
 
@@ -66,7 +70,10 @@ const ChatInterface = () => {
     const clearHistory = async () => {
         if (!currentUser) {
             setMessages([
-                { role: "bot", text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?" },
+                {
+                    role: "bot",
+                    text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?",
+                },
             ]);
             return;
         }
@@ -74,7 +81,10 @@ const ChatInterface = () => {
         try {
             await ChatApi.clearChatHistory();
             setMessages([
-                { role: "bot", text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?" },
+                {
+                    role: "bot",
+                    text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?",
+                },
             ]);
         } catch (error) {
             console.error("Error clearing chat history:", error);
@@ -91,7 +101,7 @@ const ChatInterface = () => {
     };
 
     const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
@@ -99,20 +109,35 @@ const ChatInterface = () => {
 
     const sendMessage = async () => {
         if (!inputText.trim() || isLoading) return;
-    
+
         const newMessages = [...messages, { role: "user", text: inputText }];
         setMessages(newMessages);
         setInputText("");
         setError(null);
         setIsLoading(true);
-    
+
         try {
-            const response = await ChatApi.handleChatRequest({ query: inputText });
-    
-            if (response.data && response.data.messages && response.data.messages.length > 0) {
-                const assistantMessage = response.data.messages.find(msg => msg.role === 'assistant');
+            const response = await ChatApi.handleChatRequest({
+                query: inputText,
+            });
+
+            if (
+                response.data &&
+                response.data.messages &&
+                response.data.messages.length > 0
+            ) {
+                const assistantMessage = response.data.messages.find(
+                    (msg) => msg.role === "assistant"
+                );
                 if (assistantMessage) {
-                    setMessages([...newMessages, { role: "bot", text: assistantMessage.content }]);
+                    setMessages([
+                        ...newMessages,
+                        {
+                            role: "bot",
+                            text: assistantMessage.content,
+                            source: assistantMessage.source,
+                        },
+                    ]);
                 }
             } else {
                 throw new Error("Invalid response format from server");
@@ -124,14 +149,13 @@ const ChatInterface = () => {
                 ...newMessages,
                 {
                     role: "bot",
-                    text: "Sorry, I encountered an error. Please try again or contact support if the problem persists."
-                }
+                    text: "Sorry, I encountered an error. Please try again or contact support if the problem persists.",
+                },
             ]);
         } finally {
             setIsLoading(false);
         }
     };
-    
 
     return (
         <div className="flex h-screen font-sans">
@@ -141,11 +165,16 @@ const ChatInterface = () => {
                     isOpen ? "w-64" : "w-16"
                 } p-4 shadow-lg rounded-tr-2xl`}>
                 <div>
-                    <div className={`flex justify-end mb-4 ${isOpen ? "pr-2" : ""}`}>
+                    <div
+                        className={`flex justify-end mb-4 ${
+                            isOpen ? "pr-2" : ""
+                        }`}>
                         <button
                             onClick={toggleSidebar}
                             className="p-3 text-white rounded-full focus:outline-none hover:bg-[#475569] transition-transform duration-200 ease-in-out transform hover:scale-110">
-                            <FontAwesomeIcon icon={isOpen ? faArrowLeft : faArrowRight} />
+                            <FontAwesomeIcon
+                                icon={isOpen ? faArrowLeft : faArrowRight}
+                            />
                         </button>
                     </div>
 
@@ -161,7 +190,8 @@ const ChatInterface = () => {
                             />
                             {isOpen && (
                                 <h2 className="font-bold text-lg text-gray-200 truncate max-w-[150px]">
-                                    {currentUser.profile?.firstName || currentUser.email}
+                                    {currentUser.profile?.firstName ||
+                                        currentUser.email}
                                 </h2>
                             )}
                         </div>
@@ -189,12 +219,19 @@ const ChatInterface = () => {
 
                         {isOpen && (
                             <>
-                                <button 
-                                    onClick={() => setMessages([{ role: "bot", text: "How can I help you today?" }])}
+                                <button
+                                    onClick={() =>
+                                        setMessages([
+                                            {
+                                                role: "bot",
+                                                text: "How can I help you today?",
+                                            },
+                                        ])
+                                    }
                                     className="bg-blue-500 hover:bg-blue-600 text-white w-full py-2 rounded-md shadow-md transition-transform hover:scale-105">
                                     New Chat
                                 </button>
-                                <button 
+                                <button
                                     onClick={clearHistory}
                                     className="bg-red-500 hover:bg-red-600 text-white w-full py-2 rounded-md shadow-md transition-transform hover:scale-105">
                                     Clear History
@@ -212,7 +249,7 @@ const ChatInterface = () => {
                                 Sign in to save your chats and access all the
                                 features of our platform.
                             </p>
-                            <button 
+                            <button
                                 className="flex items-center justify-center bg-white text-gray-900 px-4 py-2 rounded-full shadow hover:bg-gray-100 transition-all mx-auto"
                                 onClick={() => navigate("/sign-in")}>
                                 <FontAwesomeIcon
@@ -245,18 +282,16 @@ const ChatInterface = () => {
                             {messages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`p-4 rounded-lg shadow-sm w-max max-w-md ${
+                                    className={`p-4 rounded-lg shadow-sm ${
                                         message.role === "user"
                                             ? "bg-gray-100 ml-auto"
                                             : "bg-blue-100"
+                                    } ${
+                                        tryParseJSON(message.text)
+                                            ? "w-full"
+                                            : "w-max max-w-md"
                                     }`}>
-                                    <p className={`${
-                                        message.role === "user"
-                                            ? "text-gray-600"
-                                            : "text-blue-600"
-                                    }`}>
-                                        {message.text}
-                                    </p>
+                                    {renderMessageContent(message)}
                                 </div>
                             ))}
                             {isLoading && (

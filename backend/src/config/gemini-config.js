@@ -11,7 +11,7 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 
 const geminiModel = new ChatGoogleGenerativeAI({
     model: "gemini-pro",
-    apiKey: "AIzaSyBPZjudnDUgz5p4sCdHq5kZk4uSvGuS24o",
+    apiKey: "AIzaSyD8NHYYLWA1BrCzhq14vkLpfEeJzi-aoNw",
     maxOutputTokens: 2048,
 });
 

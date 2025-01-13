@@ -1,4 +1,4 @@
-import askQuestion from "../services/ask.js";
+import askQuestion from "../services/questionService.js";
 import User from "../models/User.js";
 import { createError } from "../utils/error.js";
 
@@ -32,6 +32,7 @@ export const handleChatRequest = async (req, res, next) => {
         const assistantMessage = {
             role: "assistant",
             content: response.text,
+            source: response.sources
         };
 
         if (userId) {
@@ -41,6 +42,7 @@ export const handleChatRequest = async (req, res, next) => {
         res.status(200).json({
             success: true,
             response: response.text,
+            source: response.sources,
             messages: [userMessage, assistantMessage],
         });
     } catch (error) {
