@@ -26,19 +26,16 @@ export const formatHotelData = (doc) => {
 };
 
 export const formatAttractionData = (doc) => {
-    // Extract itinerary information
     const itineraryInfo =
         doc.metadata.itinerary?.stops
             ?.map((stop) => `${stop.title}: ${stop.description}`)
             .join("\n") || "N/A";
 
-    // Extract ticket information
     const ticketInfo =
         doc.metadata.tickets
             ?.map((ticket) => `${ticket.type}: ${ticket.price}`)
             .join("\n") || "N/A";
 
-    // Extract inclusions
     const inclusionsInfo = doc.metadata.inclusions?.join("\n") || "N/A";
 
     return `

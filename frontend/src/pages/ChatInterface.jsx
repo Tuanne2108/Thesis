@@ -39,7 +39,6 @@ const ChatInterface = () => {
     //     }
     // }, [currentUser]);
 
-    // Scroll to bottom of messages
     useEffect(() => {
         scrollToBottom();
     }, [messages]);

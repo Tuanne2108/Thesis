@@ -52,6 +52,8 @@ async function askQuestion(question, chatHistory = []) {
             new HumanMessage({ content: question }),
         ]);
 
+        console.log('response', response.content);
+
         return {
             text: response.content,
             sources: relevantDocs.map((doc) => ({

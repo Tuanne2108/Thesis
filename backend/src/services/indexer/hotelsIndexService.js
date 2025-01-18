@@ -74,7 +74,6 @@ const formatReviewCount = (reviewStr) => {
     return match ? parseInt(match[0]) : null;
 };
 
-// Core functions
 async function withRetry(fn, retries = MAX_RETRIES) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -167,7 +166,6 @@ async function shouldUpdateHotel(hotelId, lastUpdated) {
     }
 }
 
-// Xử lý bulk operations với retry logic
 async function processBulkOperations(operations) {
     return await withRetry(async () => {
         const bulkResponse = await elasticClient.bulk({
@@ -195,7 +193,6 @@ async function processBulkOperations(operations) {
     });
 }
 
-// Hàm chính để index documents
 const indexDocuments = async (filePath, options = {}) => {
     const {
         skipExisting = false,
@@ -204,7 +201,6 @@ const indexDocuments = async (filePath, options = {}) => {
     } = options;
 
     try {
-        // Tạo index nếu chưa tồn tại
         const indexExists = await elasticClient.indices.exists({
             index: "hotels",
         });
@@ -212,11 +208,9 @@ const indexDocuments = async (filePath, options = {}) => {
             await createIndexWithMapping();
         }
 
-        // Load và normalize dữ liệu
         const loader = new DocumentLoader();
         const documents = await loader.loadDocuments(filePath);
 
-        // Xử lý theo batches
         for (let i = 0; i < documents.length; i += batchSize) {
             const batch = documents.slice(i, i + batchSize);
             const normalizedBatch = await Promise.all(
@@ -230,7 +224,6 @@ const indexDocuments = async (filePath, options = {}) => {
 
                         const hotelId = hotel.Name.replace(/\s+/g, "_");
 
-                        // Kiểm tra xem có nên skip/update document này không
                         if (skipExisting || updateExisting) {
                             const shouldUpdate = await shouldUpdateHotel(
                                 hotelId,
@@ -303,7 +296,6 @@ const indexDocuments = async (filePath, options = {}) => {
                 })
             );
 
-            // Filter out null values and prepare texts for embedding
             const validHotels = normalizedBatch.filter(
                 (hotel) => hotel !== null
             );
@@ -324,10 +316,8 @@ const indexDocuments = async (filePath, options = {}) => {
                 return parts.filter(Boolean).join(". ");
             });
 
-            // Generate embeddings for the batch
             const embeddings = await generateEmbeddings(texts);
 
-            // Prepare bulk operations
             const operations = validHotels.flatMap((hotel, index) => [
                 { index: { _index: "hotels", _id: hotel.id } },
                 {
@@ -338,13 +328,11 @@ const indexDocuments = async (filePath, options = {}) => {
             ]);
 
             if (operations.length > 0) {
-                // Process bulk operations with retry logic
                 await processBulkOperations(operations);
                 console.log(`Processed batch of ${validHotels.length} hotels`);
             }
         }
 
-        // Refresh index
         await elasticClient.indices.refresh({ index: "hotels" });
         console.log("All documents have been indexed successfully.");
     } catch (error) {

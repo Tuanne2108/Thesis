@@ -1,4 +1,3 @@
-// attractionCrawler.js
 import path from "path";
 import { promises as fs } from "fs";
 import BaseCrawler from "./baseCrawler.js";

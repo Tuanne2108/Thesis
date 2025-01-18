@@ -139,7 +139,6 @@ export const themeSettings = (mode) => {
     };
 };
 
-// context for color mode
 export const ColorModeContext = createContext({
     toggleColorMode: () => {},
 });

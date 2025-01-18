@@ -9,10 +9,13 @@ import {
 
 const AttractionTemplate = ({ message, sources }) => {
     const data = message;
-    const url =  sources;
+    const url = sources;
     const findItemUrl = (name) => {
         const item = url.find((u) => u.name === name);
         return item ? item.url : "#";
+    };
+    const formatPrice = (priceString) => {
+        return priceString.replace(/US/, "").trim();
     };
 
     return (
@@ -92,7 +95,9 @@ const AttractionTemplate = ({ message, sources }) => {
                                                         />
                                                     </div>
                                                     <span>
-                                                        {item.details.cost}
+                                                        {formatPrice(
+                                                            item.details.cost
+                                                        )}
                                                     </span>
                                                 </div>
                                             )}

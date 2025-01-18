@@ -1,4 +1,3 @@
-// attractionsIndexing.js
 import elasticClient from "../../config/elasticDb.js";
 import { generateEmbeddings } from "../embeddingService.js";
 import DocumentLoader from "../documentLoader.js";
@@ -7,7 +6,6 @@ const BATCH_SIZE = 100;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
-// Utility functions
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function withRetry(fn, retries = MAX_RETRIES) {
@@ -196,7 +194,6 @@ const createIndexWithMapping = async () => {
     }
 };
 
-// Core indexing function
 export const indexAttractions = async (filePath, options = {}) => {
     const {
         skipExisting = false,
@@ -205,7 +202,6 @@ export const indexAttractions = async (filePath, options = {}) => {
     } = options;
 
     try {
-        // Ensure index exists
         await createIndexWithMapping();
 
         const loader = new DocumentLoader();
@@ -230,7 +226,6 @@ export const indexAttractions = async (filePath, options = {}) => {
                             "_"
                         );
 
-                        // Skip/update check logic (similar to hotels)
                         if (skipExisting || updateExisting) {
                             const shouldUpdate = await shouldUpdateAttraction(
                                 attractionId,

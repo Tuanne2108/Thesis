@@ -110,7 +110,6 @@ class RetrieverService {
     }
 }
 
-// Create and export a singleton instance
 const retrieverService = new RetrieverService();
 
 retrieverService.initializeAll().catch(error => {

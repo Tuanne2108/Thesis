@@ -27,12 +27,11 @@ const detectTemplateType = (data) => {
     }
 };
 
-// Updated to accept sources prop
 const TemplateRenderer = ({ data, sources }) => {
     const templateType = detectTemplateType(data);
 
     switch (templateType) {
-        case "attraction" || "general":
+        case "attraction":
             return <AttractionTemplate message={data} sources={sources} />;
         // case 'hotel':
         //   return <HotelTemplate message={data} />;
@@ -59,7 +58,6 @@ const tryParseJSON = (text) => {
     return null;
 };
 
-// Updated to pass sources from message to TemplateRenderer
 const renderMessageContent = (message) => {
     const jsonData = tryParseJSON(message.text);
     const sources = message.source || [];

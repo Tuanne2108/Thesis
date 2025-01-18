@@ -31,11 +31,28 @@ You are a local tourism expert. Based on the following attraction information, p
     "items": [
         {
             "name": "Attraction name",
-            "description": "Brief description of the attraction",
+            "description": "Short description of the attraction",
             "duration": "Recommended visit duration (e.g., 2 hours)",
             "location": "Location/address",
             "entryFee": "Entry fee or ticket price (e.g., $10/adult)",
-            "tips": ["List of tips for visiting the attraction"]
+            "tips": ["List of tips for visiting the attraction"],
+            "itinerary": {
+                "departurePoint": "Departure point (if available)",
+                "stops": [
+                    {
+                        "stopName": "Name of the stop",
+                        "details": "Details about the stop"
+                    }
+                ]
+            },
+            "tickets": {
+                "adult": "Price for adults",
+                "child": "Price for children",
+                "infant": "Price for infants"
+            },
+            "inclusions": ["List of inclusions"],
+            "additionalInfo": ["List of additional information"],
+            "cancellationPolicy": "Cancellation policy"
         }
     ]
 }
@@ -59,7 +76,24 @@ You are an expert travel assistant. Provide travel recommendations in the follow
                         "duration": "Duration (if applicable)",
                         "location": "Location or address",
                         "cost": "Cost (if applicable)",
-                        "tips": ["List of tips"]
+                        "tips": ["List of tips"],
+                        "itinerary": {
+                            "departurePoint": "Departure point (if available)",
+                            "stops": [
+                                {
+                                    "stopName": "Name of the stop",
+                                    "details": "Details about the stop"
+                                }
+                            ]
+                        },
+                        "tickets": {
+                            "adult": "Price for adults",
+                            "child": "Price for children",
+                            "infant": "Price for infants"
+                        },
+                        "inclusions": ["List of inclusions"],
+                        "additionalInfo": ["List of additional information"],
+                        "cancellationPolicy": "Cancellation policy"
                     }
                 }
             ]

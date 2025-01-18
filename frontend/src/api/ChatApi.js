@@ -1,6 +1,5 @@
 import { chatApi } from ".";
 
-// Handle chat requests
 export const handleChatRequest = async (data) => {
   try {
     const response = await chatApi.post("/chat", data);
@@ -11,7 +10,6 @@ export const handleChatRequest = async (data) => {
   }
 };
 
-// Get chat history
 // export const getChatHistory = async () => {
 //   try {
 //     const response = await chatApi.get("/history");
@@ -22,7 +20,6 @@ export const handleChatRequest = async (data) => {
 //   }
 // };
 
-// Clear chat history
 export const clearChatHistory = async () => {
   try {
     const response = await chatApi.delete("/history");
