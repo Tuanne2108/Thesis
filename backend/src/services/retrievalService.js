@@ -5,7 +5,7 @@ import { embeddings } from "../config/gemini-config.js";
 class RetrieverService {
     constructor() {
         this.retrievers = new Map();
-        this.indices = ['hotels', 'attractions'];
+        this.indices = ["hotels", "attractions"];
     }
 
     async initialize(indexName) {
@@ -23,7 +23,10 @@ class RetrieverService {
                 );
                 this.retrievers.set(indexName, retriever);
             } catch (error) {
-                console.error(`Error initializing retriever for ${indexName}:`, error);
+                console.error(
+                    `Error initializing retriever for ${indexName}:`,
+                    error
+                );
                 throw error;
             }
         }
@@ -31,62 +34,64 @@ class RetrieverService {
     }
 
     async initializeAll() {
-        await Promise.all(
-            this.indices.map(index => this.initialize(index))
-        );
+        await Promise.all(this.indices.map((index) => this.initialize(index)));
     }
 
     async getRelevantDocuments(options) {
-        const { originalQuestion, embedding, indices = ['hotels'] } = options;
+        const { originalQuestion, embedding, indices = ["hotels"] } = options;
         try {
             const targetIndices = Array.isArray(indices) ? indices : [indices];
-            
+
             await Promise.all(
-                targetIndices.map(index => this.initialize(index))
+                targetIndices.map((index) => this.initialize(index))
             );
-    
+
             const allDocsPromises = targetIndices.map(async (index) => {
                 const retriever = this.retrievers.get(index);
                 if (!retriever) {
                     console.warn(`No retriever found for index: ${index}`);
                     return [];
                 }
-    
+
                 try {
-                    const results = await retriever.similaritySearchVectorWithScore(
-                        embedding,
-                        5,
-                        null,
-                        {
-                            vector: embedding,
-                            index: index,
-                            k: 3
-                        }
-                    );
-                    
+                    const results =
+                        await retriever.similaritySearchVectorWithScore(
+                            embedding,
+                            3,
+                            null,
+                            {
+                                vector: embedding,
+                                index: index,
+                                k: 3,
+                            }
+                        );
+
                     return results.map(([doc, score]) => ({
                         pageContent: doc.pageContent,
                         metadata: {
                             ...doc.metadata,
                             type: index.slice(0, -1),
                             score: score,
-                            originalQuery: originalQuestion
-                        }
+                            originalQuery: originalQuestion,
+                        },
                     }));
                 } catch (error) {
-                    console.error(`Error retrieving documents from ${index}:`, error);
+                    console.error(
+                        `Error retrieving documents from ${index}:`,
+                        error
+                    );
                     return [];
                 }
             });
-    
+
             const results = await Promise.all(allDocsPromises);
             const allDocs = results.flat();
-    
+
             if (allDocs.length > 0 && allDocs[0].metadata.score !== undefined) {
                 allDocs.sort((a, b) => b.metadata.score - a.metadata.score);
             }
-    
-            return allDocs.slice(0, 5);
+
+            return allDocs.slice(0, 3);
         } catch (error) {
             console.error("Error in getRelevantDocuments:", error);
             throw error;
@@ -97,7 +102,10 @@ class RetrieverService {
         try {
             return await elasticClient.indices.exists({ index: indexName });
         } catch (error) {
-            console.error(`Error checking index existence for ${indexName}:`, error);
+            console.error(
+                `Error checking index existence for ${indexName}:`,
+                error
+            );
             return false;
         }
     }
@@ -112,7 +120,7 @@ class RetrieverService {
 
 const retrieverService = new RetrieverService();
 
-retrieverService.initializeAll().catch(error => {
+retrieverService.initializeAll().catch((error) => {
     console.error("Error initializing retriever service:", error);
 });
 

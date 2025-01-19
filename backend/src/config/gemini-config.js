@@ -4,14 +4,14 @@ import { TaskType } from '@google/generative-ai';
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
     model: "text-embedding-004",
-    apiKey: process.env.EMBEDDED_API_KEY,
+    apiKey: 'AIzaSyBPZjudnDUgz5p4sCdHq5kZk4uSvGuS24o',
     taskType: TaskType.RETRIEVAL_DOCUMENT,
     title: "Document title",
 });
 
 const geminiModel = new ChatGoogleGenerativeAI({
     model: "gemini-pro",
-    apiKey: process.env.GEMINI_API_KEY,
+    apiKey: 'AIzaSyD8NHYYLWA1BrCzhq14vkLpfEeJzi-aoNw',
     maxOutputTokens: 2048,
 });
 

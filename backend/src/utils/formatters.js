@@ -5,11 +5,13 @@ export const formatHotelData = (doc) => {
         doc.metadata.roomTypes
             ?.map((room) => `${room.type} (Max: ${room.max_persons} persons)`)
             .join(", ") || "N/A";
-
+    const formatAddress = (address) => {
+        return address.replace(/\\/g, "/");
+    };
     return `
         Type: Hotel
         Name: ${doc.metadata.name || "N/A"}
-        Address: ${doc.metadata.address || "N/A"}
+        Address: ${formatAddress(doc.metadata.address) || "N/A"}
         Price: ${
             doc.metadata.price
                 ? `${doc.metadata.price.toLocaleString()} VND`

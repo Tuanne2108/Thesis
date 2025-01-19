@@ -22,8 +22,6 @@ async function askQuestion(question, chatHistory = []) {
                     ? ["hotels", "attractions"]
                     : [queryType === "hotel" ? "hotels" : "attractions"],
         });
-        console.log("queryType", queryType);
-        console.log("relevant", relevantDocs);
 
         if (!relevantDocs?.length) {
             return {
@@ -38,8 +36,6 @@ async function askQuestion(question, chatHistory = []) {
                 : formatAttractionData(doc)
         );
 
-        console.log("formattedContext", formattedContext);
-
         const response = await geminiModel.invoke([
             new SystemMessage({
                 content: `${SYSTEM_PROMPTS[queryType]}Here is the relevant information:${formattedContext}`,
@@ -52,14 +48,13 @@ async function askQuestion(question, chatHistory = []) {
             new HumanMessage({ content: question }),
         ]);
 
-        console.log('response', response.content);
-
         return {
             text: response.content,
             sources: relevantDocs.map((doc) => ({
                 name: doc.metadata.name,
                 type: doc.metadata.type,
                 url: doc.metadata.url,
+                images: doc.metadata.images
             })),
         };
     } catch (error) {

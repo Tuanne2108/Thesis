@@ -32,7 +32,7 @@ export const handleChatRequest = async (req, res, next) => {
         const assistantMessage = {
             role: "assistant",
             content: response.text,
-            source: response.sources
+            source: response.sources,
         };
 
         if (userId) {

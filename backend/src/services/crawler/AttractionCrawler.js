@@ -58,17 +58,27 @@ class AttractionCrawler extends BaseCrawler {
 
     async extractAttractionDetails(page) {
         await page.evaluate(async () => {
-            const waitAfterClick = () => new Promise(resolve => setTimeout(resolve, 1000));
-            const showMoreButtons = document.querySelectorAll('button.a83ed08757.f88a5204c2.b98133fb50');
+            const waitAfterClick = () =>
+                new Promise((resolve) => setTimeout(resolve, 1000));
+            const showMoreButtons = document.querySelectorAll(
+                "button.a83ed08757.f88a5204c2.b98133fb50"
+            );
             for (const button of showMoreButtons) {
-                if (button.textContent.includes('Show')) {
+                if (button.textContent.includes("Show")) {
                     await button.click();
                     await waitAfterClick();
                 }
             }
-            const showAllStopsButton = Array.from(document.querySelectorAll('button.a83ed08757.f88a5204c2.b98133fb50'))
-                .find(button => button.textContent.includes('Show all') && button.textContent.includes('stops'));
-            
+            const showAllStopsButton = Array.from(
+                document.querySelectorAll(
+                    "button.a83ed08757.f88a5204c2.b98133fb50"
+                )
+            ).find(
+                (button) =>
+                    button.textContent.includes("Show all") &&
+                    button.textContent.includes("stops")
+            );
+
             if (showAllStopsButton) {
                 await showAllStopsButton.click();
                 await waitAfterClick();
@@ -78,44 +88,65 @@ class AttractionCrawler extends BaseCrawler {
         await this.delay(2000);
         return page.evaluate(() => {
             const extractItinerary = () => {
-                const itinerarySection = Array.from(document.querySelectorAll("h3.f6431b446c.css-zwx81y"))
-                    .find(header => header.textContent.includes("Itinerary information"));
-                
+                const itinerarySection = Array.from(
+                    document.querySelectorAll("h3.f6431b446c.css-zwx81y")
+                ).find((header) =>
+                    header.textContent.includes("Itinerary information")
+                );
+
                 if (!itinerarySection) return null;
 
-                const stops = Array.from(document.querySelectorAll('.css-cx2ej0, .css-dba25'))
-                    .map(stop => {
-                        const name = stop.querySelector('.e1eebb6a1e')?.textContent?.trim();
-                        const duration = stop.querySelector('.a53cbfa6de')?.textContent?.trim();
-                        const description = stop.querySelector('.bcdcb105b3.fd0c3f4521')?.textContent?.trim();
-                        const admission = stop.querySelector('.a466af8d48')?.textContent?.trim();
+                const stops = Array.from(
+                    document.querySelectorAll(".css-cx2ej0, .css-dba25")
+                )
+                    .map((stop) => {
+                        const name = stop
+                            .querySelector(".e1eebb6a1e")
+                            ?.textContent?.trim();
+                        const duration = stop
+                            .querySelector(".a53cbfa6de")
+                            ?.textContent?.trim();
+                        const description = stop
+                            .querySelector(".bcdcb105b3.fd0c3f4521")
+                            ?.textContent?.trim();
+                        const admission = stop
+                            .querySelector(".a466af8d48")
+                            ?.textContent?.trim();
 
                         return {
                             name,
                             duration,
                             description,
-                            admission
+                            admission,
                         };
                     })
-                    .filter(stop => stop.name);
+                    .filter((stop) => stop.name);
 
-                const totalDuration = document.querySelector('.a3332d346a')?.textContent?.trim();
+                const totalDuration = document
+                    .querySelector(".a3332d346a")
+                    ?.textContent?.trim();
 
                 return {
                     totalDuration,
-                    stops
+                    stops,
                 };
             };
 
             const extractDeparturePoint = () => {
-                const departureContainer = document.querySelector('.f660aace8b.f81ab4937d');
+                const departureContainer = document.querySelector(
+                    ".f660aace8b.f81ab4937d"
+                );
                 if (!departureContainer) return null;
-            
-                const addressDiv = departureContainer.querySelectorAll('.f660aace8b')[1];
+
+                const addressDiv =
+                    departureContainer.querySelectorAll(".f660aace8b")[1];
                 return addressDiv?.textContent?.trim() || "";
             };
 
-            const duration = document.querySelector('.css-skmqk5 .e1eebb6a1e')?.textContent?.trim() || "";
+            const duration =
+                document
+                    .querySelector(".css-skmqk5 .e1eebb6a1e")
+                    ?.textContent?.trim() || "";
 
             const images = Array.from(
                 document.querySelectorAll('[data-testid^="gridImage-"] img')
@@ -135,11 +166,17 @@ class AttractionCrawler extends BaseCrawler {
                 .filter((text) => text.length > 0)
                 .join("\n");
 
-            const included = Array.from(document.querySelectorAll('.bcdcb105b3.f660aace8b h2'))
-                .filter(h2 => h2.textContent.includes("What's included"))
-                .flatMap(h2 => {
+            const included = Array.from(
+                document.querySelectorAll(".bcdcb105b3.f660aace8b h2")
+            )
+                .filter((h2) => h2.textContent.includes("What's included"))
+                .flatMap((h2) => {
                     const ul = h2.nextElementSibling;
-                    return ul ? Array.from(ul.querySelectorAll('li .a466af8d48')).map(item => item.textContent.trim()) : [];
+                    return ul
+                        ? Array.from(ul.querySelectorAll("li .a466af8d48")).map(
+                              (item) => item.textContent.trim()
+                          )
+                        : [];
                 })
                 .filter(Boolean);
 
@@ -201,7 +238,7 @@ class AttractionCrawler extends BaseCrawler {
                     ?.textContent.trim();
                 const currentPrice = ticketElement
                     .querySelector(".b76b1e28fc")
-                    ?.textContent.trim(); 
+                    ?.textContent.trim();
                 const originalPrice = ticketElement
                     .querySelector(".f2ce4336b0")
                     ?.textContent.trim();
@@ -224,7 +261,7 @@ class AttractionCrawler extends BaseCrawler {
                 tickets,
                 duration,
                 departurePoint: extractDeparturePoint(),
-                itinerary: extractItinerary()
+                itinerary: extractItinerary(),
             };
         });
     }
@@ -233,13 +270,16 @@ class AttractionCrawler extends BaseCrawler {
         return attractions.map((attraction) => {
             const formatItinerary = (itinerary) => {
                 if (!itinerary) return "";
-                
-                const stops = itinerary.stops.map((stop, index) => 
-                    `Stop ${index + 1}: ${stop.name}\n` +
-                    `Duration: ${stop.duration}\n` +
-                    `Description: ${stop.description}\n` +
-                    `Admission: ${stop.admission}`
-                ).join('\n\n');
+
+                const stops = itinerary.stops
+                    .map(
+                        (stop, index) =>
+                            `Stop ${index + 1}: ${stop.name}\n` +
+                            `Duration: ${stop.duration}\n` +
+                            `Description: ${stop.description}\n` +
+                            `Admission: ${stop.admission}`
+                    )
+                    .join("\n\n");
 
                 return `Total Duration: ${itinerary.totalDuration}\n\n${stops}`;
             };
@@ -270,7 +310,7 @@ class AttractionCrawler extends BaseCrawler {
         if (!tickets || !Array.isArray(tickets)) return "";
         return tickets
             .map((ticket) => {
-                const parts = [];   
+                const parts = [];
                 parts.push(`Type: ${ticket.type}`);
                 if (ticket.currentPrice)
                     parts.push(`Price: ${ticket.currentPrice}`);
@@ -349,12 +389,15 @@ class AttractionCrawler extends BaseCrawler {
     async crawlAttractions(urlList) {
         for (const item of urlList) {
             const { url, city } = item;
-            
+
             this.logProgress(`Starting attraction crawl for ${city}`);
 
-            const cityDir = path.join(this.attractionDir, city.replace(/[^a-z0-9]/gi, '-'));
+            const cityDir = path.join(
+                this.attractionDir,
+                city.replace(/[^a-z0-9]/gi, "-")
+            );
             await fs.mkdir(cityDir, { recursive: true });
-            
+
             await this.navigateWithRetry(this.page, url);
             await this.delay(2000);
             await this.handleCookieConsent();
@@ -365,7 +408,10 @@ class AttractionCrawler extends BaseCrawler {
             ]);
 
             await this.autoScroll(this.page);
-            const attractions = await this.extractAttractionData(this.page, selector);
+            const attractions = await this.extractAttractionData(
+                this.page,
+                selector
+            );
 
             const detailedAttractions = [];
             for (let i = 0; i < attractions.length; i++) {
@@ -383,7 +429,7 @@ class AttractionCrawler extends BaseCrawler {
 
             const mergedData = await this.saveToCSV(
                 detailedAttractions,
-                `${city.replace(/[^a-z0-9]/gi, '-')}_attractions.csv`,
+                `${city.replace(/[^a-z0-9]/gi, "-")}_attractions.csv`,
                 path.join(this.attractionDir, city),
                 this.flattenAttractionData
             );

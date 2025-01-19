@@ -82,9 +82,23 @@ class HotelCrawler extends BaseCrawler {
                     })
                     .filter(Boolean);
             const rulesSections = document.querySelectorAll("div.a26e4f0adb");
-            const addressElement = document.querySelector("div.a53cbfa6de.f17adf7576");
-            const address = addressElement ? 
-                addressElement.childNodes[0].textContent.trim() : "";
+            const addressElement = document.querySelector(
+                "div.a53cbfa6de.f17adf7576"
+            );
+            const address = addressElement
+                ? addressElement.childNodes[0].textContent.trim()
+                : "";
+
+            const images = Array.from(
+                document.querySelectorAll(
+                    'div[data-capla-component-boundary="b-property-web-property-page/GalleryDesktop"] img'
+                )
+            )
+                .slice(0, 7)
+                .map((img) => ({
+                    src: img.src,
+                    alt: img.alt,
+                }));
 
             return {
                 address: address,
@@ -111,6 +125,7 @@ class HotelCrawler extends BaseCrawler {
                     .join("\n"),
                 allFacilities: extractFacilities(),
                 roomDetailsList: extractRoomDetails(),
+                images: images,
             };
         });
     }
@@ -132,6 +147,7 @@ class HotelCrawler extends BaseCrawler {
             "Hotel Rules": hotel.houseRules,
             Description: hotel.description,
             URL: hotel.url,
+            Images: hotel.images?.map((img) => img.url).join(", "),
             FirstAdded: hotel.FirstAdded,
             LastUpdated: hotel.LastUpdated,
         }));
@@ -140,13 +156,16 @@ class HotelCrawler extends BaseCrawler {
     async crawlHotels(urlList) {
         for (const item of urlList) {
             const { url, city } = item;
-            
+
             this.logProgress(`Starting hotel crawl for ${city}`);
-            
+
             await this.navigateWithRetry(this.page, url);
             await this.delay(2000);
             await this.handleCookieConsent();
-            await this.loadAllResults(this.page, '[data-testid="property-card"]');
+            // await this.loadAllResults(
+            //     this.page,
+            //     '[data-testid="property-card"]'
+            // );
 
             const selector = await this.findWorkingSelector(this.page, [
                 'div[data-testid="property-card"]',
@@ -156,7 +175,7 @@ class HotelCrawler extends BaseCrawler {
             const hotels = await this.extractHotelData(this.page, selector);
 
             const detailedHotels = [];
-            for (let i = 0; i < hotels.length; i++) {
+            for (let i = 0; i < 3; i++) {
                 const hotel = hotels[i];
                 this.logProgress(
                     `Processing hotel ${i + 1}/${hotels.length}: ${hotel.name}`
@@ -168,8 +187,8 @@ class HotelCrawler extends BaseCrawler {
             }
 
             await this.saveToCSV(
-                detailedHotels, 
-                `${city}_hotels.csv`, 
+                detailedHotels,
+                `${city}_hotels.csv`,
                 this.hotelDir,
                 this.flattenHotelData
             );

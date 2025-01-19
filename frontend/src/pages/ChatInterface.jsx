@@ -25,6 +25,7 @@ const ChatInterface = () => {
     const currentUser = useSelector((state) => state.user.currentUser);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [activeContent, setActiveContent] = useState(null);
     const [messages, setMessages] = useState([
         {
             role: "bot",
@@ -85,6 +86,7 @@ const ChatInterface = () => {
                     text: "👋 Hi there! I'm your AI travel assistant. How can I help you today?",
                 },
             ]);
+            setActiveContent(null);
         } catch (error) {
             console.error("Error clearing chat history:", error);
             setError("Failed to clear chat history");
@@ -97,6 +99,31 @@ const ChatInterface = () => {
 
     const handleInputChange = (e) => {
         setInputText(e.target.value);
+    };
+
+    const getSimplifiedText = (jsonData) => {
+        if (!jsonData) return null;
+
+        const parts = [];
+
+        if (jsonData.description) {
+            parts.push(jsonData.description);
+        }
+
+        jsonData.sections.forEach((section) => {
+            const itemDescriptions = section.items
+                .map((item) => {
+                    let itemText = `• ${item.name}`;
+                    if (item.details?.description) {
+                        itemText += `\n  ${item.details.description}`;
+                    }
+                    return itemText;
+                })
+                .join("\n\n");
+            parts.push(itemDescriptions);
+        });
+
+        return parts.join("\n\n");
     };
 
     const handleKeyPress = (e) => {
@@ -129,12 +156,19 @@ const ChatInterface = () => {
                     (msg) => msg.role === "assistant"
                 );
                 if (assistantMessage) {
+                    const jsonData = tryParseJSON(assistantMessage.content);
+                    if (jsonData) {
+                        setActiveContent({
+                            text: assistantMessage.content,
+                            source: assistantMessage.source,
+                        });
+                    }
+                    const simplifiedText = getSimplifiedText(jsonData);
                     setMessages([
                         ...newMessages,
                         {
                             role: "bot",
-                            text: assistantMessage.content,
-                            source: assistantMessage.source,
+                            text: simplifiedText || assistantMessage.content,
                         },
                     ]);
                 }
@@ -155,6 +189,11 @@ const ChatInterface = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log("Active Content:", activeContent);
+    }, [activeContent]);
+    
 
     return (
         <div className="flex h-screen font-sans">
@@ -283,14 +322,17 @@ const ChatInterface = () => {
                                     key={index}
                                     className={`p-4 rounded-lg shadow-sm ${
                                         message.role === "user"
-                                            ? "bg-gray-100 ml-auto"
-                                            : "bg-blue-100"
-                                    } ${
-                                        tryParseJSON(message.text)
-                                            ? "w-full"
-                                            : "w-max max-w-md"
+                                            ? "bg-gray-100 ml-auto w-fit max-w-md"
+                                            : "bg-blue-100 w-fit max-w-md"
                                     }`}>
-                                    {renderMessageContent(message)}
+                                    <p
+                                        className={`${
+                                            message.role === "user"
+                                                ? "text-gray-600"
+                                                : "text-blue-600"
+                                        } whitespace-pre-line text-sm leading-relaxed`}>
+                                        {message.text}
+                                    </p>
                                 </div>
                             ))}
                             {isLoading && (
@@ -337,18 +379,24 @@ const ChatInterface = () => {
 
                 <div className="w-1/2 flex flex-col p-8">
                     {/* Hero Image Section */}
-                    <div
-                        className="relative w-full h-full bg-cover bg-center rounded-lg shadow-lg"
-                        style={{
-                            backgroundImage: `url(${heroImage})`,
-                        }}>
-                        <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
-                        <div className="flex items-center justify-center h-full">
-                            <h2 className="text-white text-4xl font-bold relative z-10">
-                                Discover Your Next Adventure
-                            </h2>
+                    {activeContent ? (
+                        <div className="w-full h-full bg-white rounded-lg shadow-lg overflow-auto">
+                            {renderMessageContent(activeContent)}
                         </div>
-                    </div>
+                    ) : (
+                        <div
+                            className="relative w-full h-full bg-cover bg-center rounded-lg shadow-lg"
+                            style={{
+                                backgroundImage: `url(${heroImage})`,
+                            }}>
+                            <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
+                            <div className="flex items-center justify-center h-full">
+                                <h2 className="text-white text-4xl font-bold relative z-10">
+                                    Discover Your Next Adventure
+                                </h2>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

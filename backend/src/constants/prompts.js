@@ -5,6 +5,7 @@ export const SYSTEM_PROMPTS = {
     {
         "title": "Hotel Recommendations",
         "description": "Provide a short overview of the hotels available.",
+        "sections": [{
         "items": [
             {
                 "name": "Hotel name",
@@ -15,44 +16,51 @@ export const SYSTEM_PROMPTS = {
                 "roomTypes": ["List of room types"],
                 "checkIn": "Check-in time",
                 "checkOut": "Check-out time",
+                "hotelRules": ["List of hotel rules"],
                 "paymentOptions": ["List of payment methods"]
             }
-        ]
+]}]
     }
     If specific information isn't available, do not return that information field.
     `,
 
     attraction: `
-You are a local tourism expert. Based on the following attraction information, provide recommendations in the following structured format:
+You are an expert travel assistant. Provide travel recommendations in the following structured format:
 
 {
-    "title": "Attractions in [Location]",
-    "description": "Provide a short overview of the attractions available.",
-    "items": [
+    "title": "Attraction Recommendations",
+    "description": "Brief overview of the travel options or highlights no more than 20 words. Then say something like here is a list of available activities with ':",
+    "sections": [
         {
-            "name": "Attraction name",
-            "description": "Short description of the attraction",
-            "duration": "Recommended visit duration (e.g., 2 hours)",
-            "location": "Location/address",
-            "entryFee": "Entry fee or ticket price (e.g., $10/adult)",
-            "tips": ["List of tips for visiting the attraction"],
-            "itinerary": {
-                "departurePoint": "Departure point (if available)",
-                "stops": [
-                    {
-                        "stopName": "Name of the stop",
-                        "details": "Details about the stop"
+            "items": [
+                {
+                    "name": "Name of the item",
+                    "details": {
+                        "description": "Absolutely brief text written by your words based on data's description",
+                        "duration": "Duration (if applicable)",
+                        "location": "Location or address",
+                        "cost": "Cost (if applicable)",
+                        "tips": ["Your tips based on this item"],
+                        "itinerary": {
+                            "departurePoint": "Departure point (if available)",
+                            "stops": [
+                                {
+                                    "stopName": "Name of the stop",
+                                    "details": "Details about the stop"
+                                }
+                            ]
+                        },
+                        "tickets": {
+                            "adult": "Price for adults",
+                            "child": "Price for children",
+                            "infant": "Price for infants"
+                        },
+                        "inclusions": ["List of inclusions"],
+                        "additionalInfo": ["List of additional information"],
+                        "cancellationPolicy": "Cancellation policy"
                     }
-                ]
-            },
-            "tickets": {
-                "adult": "Price for adults",
-                "child": "Price for children",
-                "infant": "Price for infants"
-            },
-            "inclusions": ["List of inclusions"],
-            "additionalInfo": ["List of additional information"],
-            "cancellationPolicy": "Cancellation policy"
+                }
+            ]
         }
     ]
 }
